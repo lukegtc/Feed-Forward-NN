@@ -6,12 +6,17 @@
 #include <random>
 #include <stdexcept>
 #include <utility>     
-
+ 
 template <typename T>
 class Matrix
 {
     // Your implementation of the Matrix class starts here
+
+    int rows;
+    int cols;
+    std::initializer_list<T>& list;
 public:
+    Matrix matrix;
     Matrix(){
         
     }
@@ -19,33 +24,33 @@ public:
     Matrix(int rows, int cols){
         int matrix[rows][cols] = {0};
     }
-    Matrix(int rows, int cols, const std::initialize_list<T>& list){
+    Matrix(int rows, int cols, const std::initializer_list<T>& list){
         if (rows*cols != list.size()){// Could be an issue on this line w size
             throw "List length does not fit the matrix dimensions!";
         };
-        float matrix[rows][cols];
+        double matrix[rows][cols];
         for (int i = 0; i< rows; i++){
             for (int j =0; j<cols; j++){
-                float matrix[i][j] = list[i*cols+j];
+                double matrix[i][j] = list(i*cols+j);
             }
         };
         this -> rows = rows;
         this -> cols = cols;
-        this -> matrix = matrix;
+        // this -> matrix = matrix;
     }
     // Move Constructor :rows(other.rows),cols(other.cols),list(other.list)
     Matrix(Matrix&& other){
         int rows = other.rows;
         int cols = other.cols;
         // std::initialize_list<T>& list = other.list;
-        float matrix = other.matrix; // fix this
+        double matrix = other.matrix; // fix this
         other.rows = 0;
         other.cols = 0;
         other.list = nullptr;
     }
     // Copy Constructor
     Matrix(const Matrix& other){
-        float matrix[other.rows][other.columns] = {0};
+        double matrix[other.rows][other.columns] = {0};
         for (int i=0; i<other.rows; i++){
             for (int j=0; j< other.cols; j++){
                 matrix[i][j] = other.matrix[i][j];
@@ -69,7 +74,7 @@ public:
             delete[] matrix;
             rows = 0;
             cols = 0;
-        list = other.list;
+        
         rows = other.rows;
         cols = other.cols;
         other.list = nullptr;
@@ -81,23 +86,23 @@ return *this;
     }
     // access operator
     T& operator[](const std::pair<int, int>& ij) {
-        if ((i >rows) || (j>cols)){
+        if ((ij.first >rows) || (ij.second>cols)){
             throw "Exceeds Dimensions!";
         };
-        return matrix[i][j];
+        return matrix[ij.first][ij.second];
     }
     // constant access operator
     const T& operator[](const std::pair<int, int>& ij) const {
-        if ((i >rows) || (j>cols)){
+        if ((ij.first >rows) || (ij.second>cols)){
             throw "Exceeds Dimensions!";
         };
-        return matrix[i][j];
+        return matrix[ij.first][ij.second];
     }
     // Arithmetic Operator
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator*(U x) const {
-        for (i = 0; i<row; i++){
-            for (j= 0; j<cols; i++){
+        for (int i = 0; i<rows; i++){
+            for (int j= 0; j<cols; i++){
                 matrix[i][j] = matrix[i][j]*x;
             }
         }
@@ -164,9 +169,16 @@ return *this;
     }
 
     // transpose
-    Matrix transpose() const {...}
-
-
+    Matrix transpose() const {
+    int new_rows = cols;
+    int new_cols = rows;
+    double newmat[new_rows][new_cols];
+        for (int i=0; i<rows; i++){
+            for (int j=0; j< cols; j++){
+                newmat[j][i] = matrix[i][j];
+            }
+        }   
+    }
 };
 
 template<typename T>
@@ -283,6 +295,6 @@ int main(int argc, char* argv[])
 {
     // Your training and testing of the Net class starts here
 
-
+    Matrix<double> mat1(2,2, {1,2,3,4});
     return 0;
 }
