@@ -36,7 +36,7 @@ public:
         };
         this -> rows = rows;
         this -> cols = cols;
-        // this -> matrix = matrix;
+        this -> matrix = matrix;
     }
     // Move Constructor :rows(other.rows),cols(other.cols),list(other.list)
     Matrix(Matrix&& other){
@@ -249,7 +249,7 @@ class Net
     // Your implementation of the Net class starts here
     // constructor
     Net(int in_features, int hidden_dim, int out_features, int n_samples, int seed){
-        
+
     }
     // destructor
     // forward function
