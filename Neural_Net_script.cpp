@@ -16,7 +16,7 @@ class Matrix
     int cols;
     std::initializer_list<T>& list;
 public:
-    Matrix matrix;
+    Matrix<double> matrix;
     Matrix(){
         
     }
@@ -31,7 +31,7 @@ public:
         double matrix[rows][cols];
         for (int i = 0; i< rows; i++){
             for (int j =0; j<cols; j++){
-                double matrix[i][j] = list(i*cols+j);
+                double matrix[i][j] = list[i*cols+j];
             }
         };
         this -> rows = rows;
@@ -248,6 +248,9 @@ class Net
 {
     // Your implementation of the Net class starts here
     // constructor
+    Net(int in_features, int hidden_dim, int out_features, int n_samples, int seed){
+        
+    }
     // destructor
     // forward function
     // backward function
