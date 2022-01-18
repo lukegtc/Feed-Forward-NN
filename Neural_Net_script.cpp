@@ -15,14 +15,13 @@ class Matrix
     int rows;
     int cols;
     std::initializer_list<T>& list;
+    double* ptr;
 public:
-    Matrix<double> matrix;
-    Matrix(){
-        
-    }
+    Matrix<double>& matrix;
+    Matrix(){}
 
     Matrix(int rows, int cols){
-        int matrix[rows][cols] = {0};
+        int matrix[rows][cols] = {};
     }
     Matrix(int rows, int cols, const std::initializer_list<T>& list){
         if (rows*cols != list.size()){// Could be an issue on this line w size
@@ -36,7 +35,7 @@ public:
         };
         this -> rows = rows;
         this -> cols = cols;
-        this -> matrix = matrix;
+        // this -> matrix = matrix;
     }
     // Move Constructor :rows(other.rows),cols(other.cols),list(other.list)
     Matrix(Matrix&& other){
