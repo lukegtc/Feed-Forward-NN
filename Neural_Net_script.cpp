@@ -74,7 +74,7 @@ public:
         Matrix matrix;
         matrix.rows = other.rows;
         matrix.cols = other.cols;
-        matrix.list = other.list;
+        matrix.data = other.data;
         return *this;
     }
 
@@ -416,11 +416,12 @@ T MSEloss(const Matrix<T>& y_true, const Matrix<T>& y_pred)
     int y_true_size = y_true.getRows() * y_true.getCols();
     Matrix<T> new_mat(y_true.getRows(),y_true.getCols());
     for (int i = 0; i< y_true.getRows(); i++){
-        for (int j = 0; j<  y_true.getCols(); j++)
+        for (int j = 0; j<  y_true.getCols(); j++){
         new_mat[{i,j}] = (y_pred[{i,j}]-y_true[{i,j}])*(y_pred[{i,j}]-y_true[{i,j}]);
-    }
-    for (int i = 0; i< y_true_size ; i++){
-        sum+=new_mat[i];
+    }}
+    for (int i = 0; i< y_true.getCols() ; i++){
+        for (int j = 0; j< y_true.getCols() ; j++)
+        sum+=new_mat[{i,j}];
     }
     return sum/(y_true_size);
 }
@@ -432,9 +433,10 @@ Matrix<T> MSEgrad(const Matrix<T>& y_true, const Matrix<T>& y_pred)
 {
     // Your implementation of the MSEgrad function starts here
     Matrix<T> grad_mat;
-    for (int i = 0; i<y_pred.getRows()*y_pred.getCols(); i++){
-        grad_mat[i] = 2*(y_pred[i]-y_true[i]);
-    }
+    for (int i = 0; i<y_pred.getRows(); i++){
+        for (int j = 0; j<*y_pred.getCols(); j++){
+        grad_mat[{i,j}] = 2*(y_pred[{i,j}]-y_true[{i,j}]);
+    }}
     return grad_mat;
 }
 
@@ -448,16 +450,20 @@ Matrix<T> argmax(const Matrix<T>& y)
             T indmax;
             T valmax = 0;
             for (int j=0; j< y.cols; j++){
-                if (y[i,j]> valmax) {indmax = j;}
+                if (y[{i,j}]> valmax) {indmax = j;}
                 }
-            matmax[0,i] = indmax;
-}}
+            matmax[{0,i}] = indmax;
+
+}
+return matmax;}
 
 // Calculate the accuracy of the prediction, using the argmax
 template <typename T>
 T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
 {
     // Your implementation of the get_accuracy starts here
+    Matrix<T> matmax_true = argmax(y_true);
+    Matrix<T> matmax_pred = argmax(y_pred);
 }
 
 
@@ -498,8 +504,14 @@ int main(int argc, char* argv[])
     int hidden_dim = 100;
     int out_features = 2;
     int n_samples = 8;
+    for (int i = 0; i<optimizer_steps; i++){
     Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
     Matrix<double> fwd_step = net.forward(xxor);
     double loss = MSEloss(yxor,fwd_step);
+    Matrix<double> gradmat = MSEgrad(yxor,fwd_step);
+    Matrix<double> back_step = net.backward(gradmat);
+    net.optimize(learning_rate);
+    double acc = get_accuracy(yxor,back_step);
+    }
     return 0;
 }
