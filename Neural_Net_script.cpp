@@ -130,6 +130,7 @@ public:
     // arithmetic operator Matrix * Matrix
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator*(const Matrix<U>& B) const {
+        
         try {
             if (cols != B.rows){
                 throw "Matrices not Compatible!";}
@@ -152,12 +153,14 @@ public:
     // arithmetic operator Matrix + Matrix
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator+(const Matrix<U>& B) const {
+        std::cout<<rows<<cols<<B.rows<<B.cols <<std::endl;
         try {
             if (((rows != B.rows) && (rows != 1))|| (cols != B.cols)){
                 throw "Matrices not Compatible!";}
         }
         catch (const char* msg) {
-            std::cout << msg << std::endl;
+            std::cout << msg <<std::endl;
+    
         }
         Matrix newmat(B.rows,B.cols);
         if (rows == 1){
@@ -272,8 +275,8 @@ public:
         }
 
         Matrix<T> weights(in_features,out_features); //normal
-        for (int i=0; i<in_features; ++i) {
-            for (int j=0; j<out_features; ++j) {
+        for (int i=0; i<in_features; i++) {
+            for (int j=0; j<out_features; j++) {
                 weights[{i,j}] = distribution_normal(generator);
             }
         }
@@ -514,13 +517,22 @@ int main(int argc, char* argv[])
     int out_features = 2;
     int n_samples = 8;
     for (int i = 0; i<optimizer_steps; i++){
+        std::cout<<i<<std::endl;
     Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
+    std::cout<<i<<std::endl;
     Matrix<double> fwd_step = net.forward(xxor);
+    std::cout<<i<<std::endl;
     double loss = MSEloss(yxor,fwd_step);
+    std::cout<<loss<<std::endl;
+    std::cout<<i<<std::endl;
     Matrix<double> gradmat = MSEgrad(yxor,fwd_step);
+    std::cout<<i<<std::endl;
     Matrix<double> back_step = net.backward(gradmat);
+    std::cout<<i<<std::endl;
     net.optimize(learning_rate);
+    std::cout<<i<<std::endl;
     double acc = get_accuracy(yxor,back_step);
+    std::cout<<acc<<std::endl;
     }
     return 0;
 }
