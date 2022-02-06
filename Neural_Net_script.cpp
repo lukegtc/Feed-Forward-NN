@@ -114,15 +114,16 @@ public:
         catch (const char* msg) {
             std::cout << msg << std::endl;
         } 
-        return  data[cols*ij.first+ij.second]; // throwing an exeption implies to return a T type value, so even if the pair exeeds dimension, a value must e will be returned.
+        return  data[cols*ij.first+ij.second]; // throwing an exeption implies to return a T type value, so even if the pair exeeds dimension, a value will be returned.
     }
 
     // arithmetic operator Matrix * scalar
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator*(U x) const {
-        Matrix newmat(rows,cols);
-        for (int i = 0; i<rows*cols; i++)
-                newmat.data[i] = data[i] * x;  
+        Matrix<T> newmat(rows,cols);
+        for (int i = 0; i<rows; i++){
+            for (int j = 0; j<cols; j++){
+                newmat[{i,j}] = data[i*cols+j] * x; } }
         return newmat;
     }
 
@@ -434,7 +435,7 @@ Matrix<T> MSEgrad(const Matrix<T>& y_true, const Matrix<T>& y_pred)
     // Your implementation of the MSEgrad function starts here
     Matrix<T> grad_mat;
     for (int i = 0; i<y_pred.getRows(); i++){
-        for (int j = 0; j<*y_pred.getCols(); j++){
+        for (int j = 0; j<y_pred.getCols(); j++){
         grad_mat[{i,j}] = 2*(y_pred[{i,j}]-y_true[{i,j}]);
     }}
     return grad_mat;
@@ -464,6 +465,14 @@ T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
     // Your implementation of the get_accuracy starts here
     Matrix<T> matmax_true = argmax(y_true);
     Matrix<T> matmax_pred = argmax(y_pred);
+    double tot;
+    for (int i=0; i<y_true.getRows(); i++){
+        for (int j = 0; j<y_true.getCols(); j++){
+            tot +=(matmax_true[{i,j}]-matmax_pred[{i,j}])/matmax_true[{i,j}];
+
+        }
+    }
+    return tot/(y_true.getRows()*y_true.getCols());
 }
 
 
