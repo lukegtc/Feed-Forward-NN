@@ -237,13 +237,16 @@ template <typename T>
 class Linear: public Layer<T>
 {
 
+int in_features;
+int out_features;
+int n_samples;
 public:
 
-    Matrix<T> cache();
-    Matrix<T> bias();
-    Matrix<T> weights();
-    Matrix<T> bias_gradients();
-    Matrix<T> weights_gradient();
+    Matrix<T> cache;
+    Matrix<T> bias;
+    Matrix<T> weights;
+    Matrix<T> bias_gradients;
+    Matrix<T> weights_gradient;
 
 
     // default constructor
@@ -312,11 +315,11 @@ int n_samples;
 
 public:
 
-    Matrix<T> cache();
-    Matrix<T> bias();
-    Matrix<T> weights();
-    Matrix<T> bias_gradients();
-    Matrix<T> weights_gradient();
+    Matrix<T> cache;
+    Matrix<T> bias;
+    Matrix<T> weights;
+    Matrix<T> bias_gradients;
+    Matrix<T> weights_gradient;
 
 
     // default constructor
@@ -337,14 +340,22 @@ public:
     // forward function
     virtual Matrix<T> forward(const Matrix<T>& x) override final {
         Matrix<T> y;
-        for (int i=0; i<x.rows*x.cols; ++i) {
-            y[i] = std::max(0,x[i]);}
+        for (int i=0; i<x.rows; i++) {
+            for(int j=0; j<x.cols; j++){
+                
+            y[{i,j}] = std::max(0.0,x[{i,j}]);}}
         return y;
     }
 
     // backward function
     virtual Matrix<T> backward(const Matrix<T>& dy) override final {
-        
+        Matrix<T> dx;
+        for (int i=0; i<dy.rows; i++) {
+            for (int j=0; j<dy.cols; j++)
+            if (
+                dy[{i,j}]<0){dx[{i,j}] = 0;}
+            else {dx[{i,j}] = 1;}}
+        return dx;
     }
     
 };
@@ -356,12 +367,17 @@ class Net
 {
     // Your implementation of the Net class starts here
     // default constructor
+    public:
+        Linear<T> linear1;
+        ReLu<T> relu;
+        Linear<T> linear2;
+
     Net() {}
     // constructor
     Net(int in_features, int hidden_dim, int out_features, int n_samples, int seed) {
-        Linear<double> linear1(in_features, out_features, n_samples, seed);
-        ReLu<double> relu(in_features, out_features, n_samples);
-        Linear<double> linear2(in_features, out_features, n_samples, seed);
+        Linear<T> linear1(in_features, out_features, n_samples, seed);
+        ReLu<T> relu(in_features, out_features, n_samples);
+        Linear<T> linear2(in_features, out_features, n_samples, seed);
 
     }
     // destructor
@@ -391,7 +407,7 @@ class Net
     }
 };
 
- // Function to calculate the loss
+//  Function to calculate the loss
 template <typename T>
 T MSEloss(const Matrix<T>& y_true, const Matrix<T>& y_pred) 
 {
@@ -399,8 +415,9 @@ T MSEloss(const Matrix<T>& y_true, const Matrix<T>& y_pred)
     float sum = 0;
     int y_true_size = y_true.getRows() * y_true.getCols();
     Matrix<T> new_mat(y_true.getRows(),y_true.getCols());
-    for (int i = 0; i< y_true_size; i++){
-        new_mat[i] = (y_pred[i]-y_true[i])*(y_pred[i]-y_true[i]);
+    for (int i = 0; i< y_true.getRows(); i++){
+        for (int j = 0; j<  y_true.getCols(); j++)
+        new_mat[{i,j}] = (y_pred[{i,j}]-y_true[{i,j}])*(y_pred[{i,j}]-y_true[{i,j}]);
     }
     for (int i = 0; i< y_true_size ; i++){
         sum+=new_mat[i];
@@ -409,12 +426,17 @@ T MSEloss(const Matrix<T>& y_true, const Matrix<T>& y_pred)
 }
 
 
-// // Function to calculate the gradients of the loss
-// template <typename T>
-// Matrix<T> MSEgrad(const Matrix<T>& y_true, const Matrix<T>& y_pred) 
-// {
-//     // Your implementation of the MSEgrad function starts here
-// }
+// Function to calculate the gradients of the loss
+template <typename T>
+Matrix<T> MSEgrad(const Matrix<T>& y_true, const Matrix<T>& y_pred) 
+{
+    // Your implementation of the MSEgrad function starts here
+    Matrix<T> grad_mat;
+    for (int i = 0; i<y_pred.getRows()*y_pred.getCols(); i++){
+        grad_mat[i] = 2*(y_pred[i]-y_true[i]);
+    }
+    return grad_mat;
+}
 
  // Calculate the argmax 
 template <typename T>
@@ -444,28 +466,40 @@ int main(int argc, char* argv[])
 {
     // Your training and testing of the Net class starts here
 
-    Matrix<double> mat1(2,2,{1,2,3,4});
-    std::pair<int, int> pair1(0,1);
-    int x = 3;
-    Matrix<double> mat2 = mat1*x;
-    Matrix<double> mat3 = mat1*mat1;
-    Matrix<double> mat4 = mat3-mat1;
-    Matrix<double> mat5 = mat1.transpose();
-    std::cout<<mat5.getCols()<<std::endl;
-    std::cout<<mat5[pair1]<<std::endl;
-    std::cout<<mat4[pair1]<<std::endl;
-    std::cout<<mat3[pair1]<<std::endl;
-    std::cout<<mat2[pair1]<<std::endl;
-    std::cout<<mat1[pair1]<<std::endl;
-    Matrix<double> mat6(2,2,{1,2,3,4,5});
-    std::pair<int, int> pair2(0,2);
-    std::cout<<mat1[pair2]<<std::endl;
+    // Matrix<double> mat1(2,2,{1,2,3,4});
+    // std::pair<int, int> pair1(0,1);
+    // int x = 3;
+    // Matrix<double> mat2 = mat1*x;
+    // Matrix<double> mat3 = mat1*mat1;
+    // Matrix<double> mat4 = mat3-mat1;
+    // Matrix<double> mat5 = mat1.transpose();
+    // std::cout<<mat5.getCols()<<std::endl;
+    // std::cout<<mat5[pair1]<<std::endl;
+    // std::cout<<mat4[pair1]<<std::endl;
+    // std::cout<<mat3[pair1]<<std::endl;
+    // std::cout<<mat2[pair1]<<std::endl;
+    // std::cout<<mat1[pair1]<<std::endl;
+    // Matrix<double> mat6(2,2,{1,2,3,4,5});
+    // std::pair<int, int> pair2(0,2);
+    // std::cout<<mat1[pair2]<<std::endl;
     
-    Matrix<double> mat10(2,3,{1,2,3,4,5,6});
-    Matrix<double> mat7 = mat1*mat10;
-    Matrix<double> mat8 = mat3-mat10;
-    //std::cout<<mat8[pair2]<<std::endl;
+    // Matrix<double> mat10(2,3,{1,2,3,4,5,6});
+    // Matrix<double> mat7 = mat1*mat10;
+    // Matrix<double> mat8 = mat3-mat10;
+    // //std::cout<<mat8[pair2]<<std::endl;
 
-    Matrix<double> mat9 = mat3+mat10;
+    // Matrix<double> mat9 = mat3+mat10;
+    double learning_rate = 0.0005;
+    int optimizer_steps = 100;
+    int seed = 1;
+    Matrix<double> xxor(4,2,{0,0,0,1,1,0,1,1});
+    Matrix<double> yxor(4,2,{1,0,0,1,0,1,1,0});
+    int in_features = 2;
+    int hidden_dim = 100;
+    int out_features = 2;
+    int n_samples = 8;
+    Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
+    Matrix<double> fwd_step = net.forward(xxor);
+    double loss = MSEloss(yxor,fwd_step);
     return 0;
 }
