@@ -79,7 +79,7 @@ public:
     }
 
     // Move assignment operator
-    Matrix& operator=(const Matrix&& other){
+    Matrix& operator=(Matrix&& other){
         if (this !=&other){
         delete[] data;
         data = other.data;
