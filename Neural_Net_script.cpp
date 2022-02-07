@@ -24,12 +24,13 @@ public:
     }
 
     Matrix(int rows, int cols):data(new double[rows*cols]{0}){
+        std::cout<<"Matrix Created"<<std::endl;
         this -> rows = rows;
         this -> cols = cols;    
     }
 
     Matrix(int rows, int cols, const std::initializer_list<T>& list):Matrix(rows,cols){
-        std::cout<<"Matrix Created"<<std::endl;
+        std::cout<<"Filled Matrix Created"<<std::endl;
         try {
             if (rows*cols != (int)list.size()){
                 throw "List length does not fit the matrix dimensions!";}
@@ -41,11 +42,12 @@ public:
     }
 
     // Move Constructor :rows(other.rows),cols(other.cols),list(other.list)
-    Matrix(Matrix&& other):rows(other.rows),cols(other.cols),data(other.data){
-        // int rows = other.rows;
-        // int cols = other.cols;
-        // std::initialize_list<T>& list = other.list;
-        // double matrix = other.matrix; // fix this
+    Matrix(Matrix&& other){
+        rows = other.rows;
+        cols = other.cols;
+
+        delete[] data;
+        data = other.data;
         other.rows = 0;
         other.cols = 0;
         other.data = nullptr;
@@ -64,10 +66,13 @@ public:
 
     // Destructor
     ~Matrix(){
+    std::cout<<rows<<std::endl;
+    std::cout<<cols<<std::endl;
     delete[] data;
     data = nullptr;
     rows = 0;
     cols = 0;
+    std::cout<< "Matrix Destroyed"<<std::endl;
     }
 
     // Copy assignment operator
@@ -85,12 +90,17 @@ public:
         if (this !=&other){
         std::cout<<"Move Assignment Operator"<<std::endl;
         delete[] data;
-        data = other.data;
-        rows = other.rows;
-        cols = other.cols;
-        other.data = nullptr;
+        this -> data = new T[other.rows*other.cols]{0};
+        this -> rows = other.rows;
+        this -> cols = other.cols;
+        
         other.rows = 0;
         other.cols = 0;
+        for (int i = 0; i<other.rows*other.cols; i++){
+            data[i] = other.data[i];
+        }
+        delete[] other.data;
+        other.data = nullptr;
         }
         return *this;
     }
@@ -146,7 +156,7 @@ public:
         catch (const char* msg) {
             std::cout << msg << std::endl;
         } 
-        Matrix newmat(rows,B.cols);
+        Matrix<T> newmat(rows,B.cols);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < B.cols; j++) {
             
@@ -158,104 +168,60 @@ public:
     return newmat;
     }
 
-    // Matrix Addition Operator
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator+(const Matrix<U>& B) const {
-        std::cout<<"Matrix Addition Operator"<<std::endl;
-
+        std::cout<<rows<<cols<<B.rows<<B.cols <<std::endl;
         try {
-            if (((rows != B.rows) && ((rows != 1)&&(B.rows != 1))|| (cols != B.cols))){
+            if (((rows != B.rows) && (rows != 1))|| (cols != B.cols)){
                 throw "Matrices not Compatible!";}
         }
         catch (const char* msg) {
             std::cout << msg <<std::endl;
     
         }
-        if (((rows == 1) && (B.rows != 1)) && (cols == B.cols)){
-            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
+        Matrix newmat(B.rows,B.cols);
+        if (rows == 1){
+        
             for (int i=0; i<B.rows; i++){
                 for (int j=0; j< B.cols; j++){
                     newmat.data[i*cols + j] = data[j] + B.data[i*cols+j];
+                    }
                 }
-            }
-            return newmat;
-        }
-        
-        if (((B.rows == 1) && (rows != 1)) && (cols == B.cols)){
-            Matrix<typename std::common_type<T,U>::type> newmat(rows,cols);
-            for (int i=0; i<rows; i++){
-                for (int j=0; j< cols; j++){
-                    newmat.data[i*cols + j] = data[i*cols+j] + B.data[j];
+            };
+        for (int i=0; i<B.rows; i++){
+            for (int j=0; j< B.cols; j++){
+                newmat.data[i*cols + j] = data[i*cols + j] + B.data[i*cols + j];
                 }
-            }
-            return newmat;
-        }  
-        
-        if ((rows == B.rows) && (cols == B.cols)){
-            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
-            for (int i=0; i<B.rows; i++){
-                for (int j=0; j< B.cols; j++){
-                    newmat.data[i*cols + j] = data[i*cols + j] + B.data[i*cols + j];
-                }
-            }
-        
-            return newmat;
-    }
-            else{
-            Matrix<typename std::common_type<T,U>::type> newmat;
-            return newmat;
-        }
+            };
+    return newmat;
     }
 
-    // Matrix Subtraction Operator
+    // arithmetic operator Matrix - Matrix
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator-(const Matrix<U>& B) const {
-            std::cout<<"Matrix Subtraction Operator"<<std::endl;
         try {
-            if (((rows != B.rows) && ((rows != 1)&&(B.rows != 1))|| (cols != B.cols))){
+            if (((rows != B.rows) && (rows != 1))|| (cols != B.cols)){
                 throw "Matrices not Compatible!";}
         }
         catch (const char* msg) {
             std::cout << msg << std::endl;
         }
-
-        if (((rows == 1) && (B.rows != 1)) && (cols == B.cols)){
-            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
+        Matrix newmat(B.rows,B.cols);
+        if (rows == 1){
+        
             for (int i=0; i<B.rows; i++){
                 for (int j=0; j< B.cols; j++){
                     newmat.data[i*cols + j] = data[j] - B.data[i*cols+j];
+                    }
                 }
-            }
-            return newmat;
-        }
-        
-        if (((B.rows == 1) && (rows != 1)) && (cols == B.cols)){
-            Matrix<typename std::common_type<T,U>::type> newmat(rows,cols);
-            for (int i=0; i<rows; i++){
-                for (int j=0; j< cols; j++){
-                    newmat.data[i*cols + j] = data[i*cols+j] - B.data[j];
+            };
+        for (int i=0; i<B.rows; i++){
+            for (int j=0; j< B.cols; j++){
+                newmat.data[i*cols + j] = data[i*cols + j] - B.data[i*cols + j];
                 }
-            }
-            return newmat;
-        }  
-        
-        if ((rows == B.rows) && (cols == B.cols)){
-            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
-            for (int i=0; i<B.rows; i++){
-                for (int j=0; j< B.cols; j++){
-                    newmat.data[i*cols + j] = data[i*cols + j] - B.data[i*cols + j];
-                }
-            }
-        
-            return newmat;
-        }
-        
-        else{
-            Matrix<typename std::common_type<T,U>::type> newmat;
-            return newmat;
-        }
+            };
+        return newmat;
     }
-
     // transpose
     Matrix transpose() const {
                 std::cout<<"Transpose"<<std::endl;
@@ -318,23 +284,23 @@ public:
         std::normal_distribution<T>       distribution_normal(0.0, 1.0);
         std::uniform_real_distribution<T> distribution_uniform(0.0, 1.0);
 
-        this-> bias = Matrix<T>(1,out_features); //uniform
+        bias = Matrix<T>(1,out_features); //uniform
         for (int i=0; i<out_features; i++) {
             
             bias[{0,i}] = (int)distribution_uniform(generator);
             
         }
 
-        this-> weights = Matrix<T>(in_features,out_features); //normal
+        weights = Matrix<T>(in_features,out_features); //normal
         for (int i=0; i<in_features; i++) {
             for (int j=0; j<out_features; j++) {
-                weights[{i,j}] = distribution_normal(generator);
+                weights[{i,j}] = (int)distribution_normal(generator);
             }
         }
 
-        this-> bias_gradients = Matrix<T>(1,out_features); //zeros
-        this-> weights_gradients = Matrix<T>(in_features,out_features); //zeros
-        this-> cache = Matrix<T>(n_samples,in_features); //zeros
+        bias_gradients = Matrix<T>(1,out_features); //zeros
+        weights_gradients = Matrix<T>(in_features,out_features); //zeros
+        cache = Matrix<T>(n_samples,in_features); //zeros
         std::cout<<weights.rows<<std::endl;
     }
 
@@ -567,32 +533,32 @@ int main(int argc, char* argv[])
     // //std::cout<<mat8[pair2]<<std::endl;
 
     // Matrix<double> mat9 = mat3+mat10;
-    double learning_rate = 0.0005;
-    int optimizer_steps = 100;
-    int seed = 1;
-    Matrix<double> xxor(4,2,{0,0,0,1,1,0,1,1});
-    Matrix<double> yxor(4,2,{1,0,0,1,0,1,1,0});
-    int in_features = 2;
-    int hidden_dim = 100;
-    int out_features = 2;
-    int n_samples = 8;
-    for (int i = 0; i<optimizer_steps; i++){
-        std::cout<<i<<std::endl;
-    Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
+    // double learning_rate = 0.0005;
+    // int optimizer_steps = 100;
+    // int seed = 1;
+    // Matrix<double> xxor(4,2,{0,0,0,1,1,0,1,1});
+    // Matrix<double> yxor(4,2,{1,0,0,1,0,1,1,0});
+    // int in_features = 2;
+    // int hidden_dim = 100;
+    // int out_features = 2;
+    // int n_samples = 8;
+    // for (int i = 0; i<optimizer_steps; i++){
+    //     std::cout<<i<<std::endl;
+    // Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
     
-    Matrix<double> fwd_step = net.forward(xxor);
+    // Matrix<double> fwd_step = net.forward(xxor);
     
-    double loss = MSEloss(yxor,fwd_step);
-    std::cout<<loss<<std::endl;
+    // double loss = MSEloss(yxor,fwd_step);
+    // std::cout<<loss<<std::endl;
     
-    Matrix<double> gradmat = MSEgrad(yxor,fwd_step);
+    // Matrix<double> gradmat = MSEgrad(yxor,fwd_step);
     
-    Matrix<double> back_step = net.backward(gradmat);
+    // Matrix<double> back_step = net.backward(gradmat);
     
-    net.optimize(learning_rate);
+    // net.optimize(learning_rate);
     
-    double acc = get_accuracy(yxor,back_step);
-    
-    }
+    // double acc = get_accuracy(yxor,back_step);
+    // std::cout<<acc<<std::endl;
+    // }
     return 0;
 }
