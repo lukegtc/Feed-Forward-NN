@@ -29,6 +29,7 @@ public:
     }
 
     Matrix(int rows, int cols, const std::initializer_list<T>& list):Matrix(rows,cols){
+        std::cout<<"Matrix Created"<<std::endl;
         try {
             if (rows*cols != (int)list.size()){
                 throw "List length does not fit the matrix dimensions!";}
@@ -71,6 +72,7 @@ public:
 
     // Copy assignment operator
     Matrix operator=(const Matrix& other){
+        std::cout<<"Copy Assignment Operator"<<std::endl;
         Matrix matrix;
         matrix.rows = other.rows;
         matrix.cols = other.cols;
@@ -81,6 +83,7 @@ public:
     // Move assignment operator
     Matrix& operator=(Matrix&& other){
         if (this !=&other){
+        std::cout<<"Move Assignment Operator"<<std::endl;
         delete[] data;
         data = other.data;
         rows = other.rows;
@@ -94,6 +97,7 @@ public:
 
     // access operator
     T& operator[](const std::pair<int, int>& ij){
+        // std::cout<<"Access Operator"<<std::endl;
         try {
         if ((ij.first >rows) || (ij.second>cols)){
             throw "Exceeds Dimensions!";}
@@ -107,6 +111,7 @@ public:
 
     // constant access operator
     const T& operator[](const std::pair<int, int>& ij) const {
+        std::cout<<"Constant Access Operator"<<std::endl;
        try {
             if ((ij.first >rows) || (ij.second>cols)){
                 throw "Exceeds Dimensions!";}
@@ -117,9 +122,10 @@ public:
         return  data[cols*ij.first+ij.second]; // throwing an exeption implies to return a T type value, so even if the pair exeeds dimension, a value will be returned.
     }
 
-    // arithmetic operator Matrix * scalar
+    // Scalar Multiplication Operator
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator*(U x) const {
+        std::cout<<"Scalar Multiplication Operator"<<std::endl;
         Matrix<T> newmat(rows,cols);
         for (int i = 0; i<rows; i++){
             for (int j = 0; j<cols; j++){
@@ -127,10 +133,12 @@ public:
         return newmat;
     }
 
-    // arithmetic operator Matrix * Matrix
+    // Matrix Multiplication Operator
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator*(const Matrix<U>& B) const {
-        
+        std::cout<<"Matrix Multiplication Operator"<<std::endl;
+        std::cout<<cols<<std::endl;
+        std::cout<<B.rows<<std::endl;
         try {
             if (cols != B.rows){
                 throw "Matrices not Compatible!";}
@@ -150,10 +158,11 @@ public:
     return newmat;
     }
 
-    // arithmetic operator Matrix + Matrix
+    // Matrix Addition Operator
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator+(const Matrix<U>& B) const {
-        std::cout<<rows<<cols<<B.rows<<B.cols <<std::endl;
+        std::cout<<"Matrix Addition Operator"<<std::endl;
+
         try {
             if (((rows != B.rows) && (rows != 1))|| (cols != B.cols)){
                 throw "Matrices not Compatible!";}
@@ -179,9 +188,11 @@ public:
     return newmat;
     }
 
-    // arithmetic operator Matrix - Matrix
+    // Matrix Subtraction Operator
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator-(const Matrix<U>& B) const {
+            std::cout<<"Matrix Subtraction Operator"<<std::endl;
+
         try {
             if (((rows != B.rows) && (rows != 1))|| (cols != B.cols)){
                 throw "Matrices not Compatible!";}
@@ -208,6 +219,8 @@ public:
 
     // transpose
     Matrix transpose() const {
+                std::cout<<"Transpose"<<std::endl;
+
         Matrix newmat(cols,rows);
         for (int i=0; i<rows; i++){
             for (int j=0; j< cols; j++){
@@ -257,11 +270,9 @@ public:
     Linear() {}
     
     // constructor
-    Linear(int in_features, int out_features, int n_samples, int seed) {
-
-        this -> in_features=in_features;
-        this -> out_features=out_features;
-        this -> n_samples=n_samples;
+    Linear(int in_features, int out_features, int n_samples, int seed):
+    in_features(in_features), out_features(out_features), n_samples(n_samples) {
+        std::cout<<"Linear Layer Constructed"<<std::endl;
 
         std::default_random_engine        generator(seed);
         std::normal_distribution<T>       distribution_normal(0.0, 1.0);
@@ -282,7 +293,7 @@ public:
         }
 
         Matrix<T> bias_gradients(1,out_features); //zeros
-        Matrix<T> weights_gradients(in_features,out_features); //zeros
+        Matrix<T> weights_gradient(in_features,out_features); //zeros
         Matrix<T> cache(n_samples,in_features); //zeros
     }
 
@@ -331,7 +342,7 @@ public:
     
     // constructor
     ReLu(int in_features, int out_features, int n_samples) {
-
+    std::cout<<"ReLu Layer Constructed"<<std::endl;
         Matrix<T> cache(n_samples,in_features); //zeros
         this -> in_features=in_features;
         this -> out_features=out_features;
