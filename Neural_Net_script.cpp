@@ -231,7 +231,7 @@ public:
         }
     }
 
-    // arithmetic operator Matrix - Matrix
+    // arithmetic operator Matrix - Matrix chew
     template<typename U>
     Matrix<typename std::common_type<T,U>::type> operator-(const Matrix<U>& B) const {
         try {
