@@ -171,14 +171,18 @@ public:
             std::cout << msg << std::endl;
         }
         Matrix<T> newmat(rows, B.cols);
-        std::cout<<newmat.list.size()<<std::endl;
+    
+        std::cout<<newmat.getRows()<<" "<<newmat.getCols()<<std::endl;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < B.cols; j++) {
-
+               double temp_sum = 0;
+               std::cout<<"uhoh"<<std::endl;
                 for (int k = 0; k < B.rows; k++) {
-                    std::cout<<"uhoh"<<std::endl;
-                    newmat.data[i * newmat.cols + j] += data[i * cols + k] * B.data[k * B.cols + j];
+                    
+                temp_sum += data[i * cols + k] * B.data[k * B.cols + j]; 
                 }
+                newmat.data[i * newmat.cols + j] = temp_sum;
+                 std::cout<<newmat.data[i * newmat.cols + j]<<std::endl;
             }
         }
         return newmat;
@@ -388,15 +392,16 @@ public:
 
         for (int i = 0; i< dy.getCols();i++){
             double tot = 0;
-            for (int j; j< dy.getRows();j++){
+            for (int j = 0; j< dy.getRows();j++){
                 tot+=dy[{j,i}];
-                bias_gradients[{0,i}] = tot;
+                this -> bias_gradients[{0,i}] = tot;
             }
         }
-        std::cout<<dy.getRows()<<dy.getCols()<<std::endl;
-        std::cout<<weights.getRows()<<weights.getCols()<<std::endl;
-        Matrix<T> dx = dy*weights.transpose();
-        return dx;
+        matprint(bias_gradients);
+        // std::cout<<dy.getRows()<<dy.getCols()<<std::endl;
+        // std::cout<<weights.getRows()<<weights.getCols()<<std::endl;
+        
+        return dy*weights.transpose();
     }
 
     // optimize function
@@ -506,9 +511,7 @@ public:
 
     // backward function
     Matrix<T> backward(const Matrix<T> &dy) {
-        Matrix<T> matlinear2 = linear2.backward(dy);
-        Matrix<T> matrelu = relu.backward(matlinear2);
-        Matrix<T> matlinear1 = linear1.backward(matrelu);
+    Matrix<T> matlinear1 = linear1.backward(relu.backward(linear2.backward(dy)));
         return matlinear1;
     }
 
