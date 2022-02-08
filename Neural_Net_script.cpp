@@ -24,7 +24,7 @@ public:
     }
 
     Matrix(int rows, int cols) : data(new double[rows * cols]{0}) {
-        std::cout << "Matrix Created" << std::endl;
+        // std::cout << "Matrix Created" << std::endl;
         this->rows = rows;
         this->cols = cols;
     }
@@ -47,7 +47,7 @@ public:
         rows = other.rows;
         cols = other.cols;
 
-        delete[] data;
+        // delete[] data;
         data = other.data;
         other.rows = 0;
         other.cols = 0;
@@ -55,14 +55,15 @@ public:
         std::cout << "Move Constructor" << std::endl;
     }
 
-    // Copy Constructor
-    Matrix(const Matrix &other) : Matrix(other.rows, other.cols) {
+    // Copy Constructor IT WAS THIS ALL ALONG ARGHHHH-------------------------------
+    Matrix(Matrix &other) : Matrix(other.rows, other.cols) {
         //     double matrix[other.rows][other.columns] = {0};
         for (int i = 0; i < other.rows; i++) {
             for (int j = 0; j < other.cols; j++) {
                 data[i * cols + j] = other.data[i * cols + j];
             }
         }
+        std::cout << "Copy Constructor" << std::endl;
     }
 
     // Destructor
@@ -78,7 +79,7 @@ public:
 
     // Copy assignment operator
     Matrix &operator=(const Matrix &other) {
-        std::cout << "Copy Assignment Operator" << std::endl;
+        // std::cout << "Copy Assignment Operator" << std::endl;
         if (&other == this) {
             return *this;
         }
@@ -98,7 +99,7 @@ public:
     // Move assignment operator
     Matrix &operator=(Matrix &&other) noexcept {
         if (this != &other) {
-            std::cout << "Move Assignment Operator" << std::endl;
+            // std::cout << "Move Assignment Operator" << std::endl;
             delete[] data;
             this->data = other.data;
             this->rows = other.rows;
@@ -163,82 +164,122 @@ public:
         std::cout << B.rows << std::endl;
         try {
             if (cols != B.getRows()) {
-                throw "Matrices not Compatible!";
+                throw "Multiplication between Matrices not Compatible!";
             }
         }
         catch (const char *msg) {
             std::cout << msg << std::endl;
         }
         Matrix<T> newmat(rows, B.cols);
+        std::cout<<newmat.list.size()<<std::endl;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < B.cols; j++) {
 
                 for (int k = 0; k < B.rows; k++) {
+                    std::cout<<"uhoh"<<std::endl;
                     newmat.data[i * newmat.cols + j] += data[i * cols + k] * B.data[k * B.cols + j];
                 }
             }
         }
         return newmat;
     }
-
+// arithmetic operator Matrix + Matrix
     template<typename U>
-    Matrix<typename std::common_type<T, U>::type> operator+(const Matrix<U> &B) const {
-        std::cout << rows << cols << B.rows << B.cols << std::endl;
+    Matrix<typename std::common_type<T,U>::type> operator+(const Matrix<U>& B) const {
         try {
-            if (((rows != B.rows) && (rows != 1)) || (cols != B.cols)) {
-                throw "Matrices not Compatible!";
-            }
+            if ((((this->rows != B.rows) && ((this->rows != 1)&&(B.rows != 1)))|| (this->cols != B.cols))){
+                throw "Matrices not Compatible!";}
         }
-        catch (const char *msg) {
+        catch (const char* msg) {
             std::cout << msg << std::endl;
-
         }
-        Matrix newmat(B.rows, B.cols);
-        if (rows == 1) {
 
-            for (int i = 0; i < B.rows; i++) {
-                for (int j = 0; j < B.cols; j++) {
-                    newmat.data[i * cols + j] = data[j] + B.data[i * cols + j];
+        if (((rows == 1) && (B.rows != 1)) && (cols == B.cols)){
+            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
+            for (int i=0; i<B.rows; i++){
+                for (int j=0; j< B.cols; j++){
+                    newmat.data[i*cols + j] = data[j] + B.data[i*cols+j];
                 }
             }
-        };
-        for (int i = 0; i < B.rows; i++) {
-            for (int j = 0; j < B.cols; j++) {
-                newmat.data[i * cols + j] = data[i * cols + j] + B.data[i * cols + j];
+            return newmat;
+        }
+        
+        if (((B.rows == 1) && (rows != 1)) && (cols == B.cols)){
+            Matrix<typename std::common_type<T,U>::type> newmat(rows,cols);
+            for (int i=0; i<rows; i++){
+                for (int j=0; j< cols; j++){
+                    newmat.data[i*cols + j] = data[i*cols+j] + B.data[j];
+                }
             }
-        };
-        return newmat;
+            return newmat;
+        }  
+        
+        if ((rows == B.rows) && (cols == B.cols)){
+            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
+            for (int i=0; i<B.rows; i++){
+                for (int j=0; j< B.cols; j++){
+                    newmat.data[i*cols + j] = data[i*cols + j] + B.data[i*cols + j];
+                }
+            }
+        
+            return newmat;
+        }
+        
+        else{
+            Matrix<typename std::common_type<T,U>::type> newmat;
+            return newmat;
+        }
     }
 
     // arithmetic operator Matrix - Matrix
     template<typename U>
-    Matrix<typename std::common_type<T, U>::type> operator-(const Matrix<U> &B) const {
+    Matrix<typename std::common_type<T,U>::type> operator-(const Matrix<U>& B) const {
         try {
-            if (((rows != B.rows) && (rows != 1)) || (cols != B.cols)) {
-                throw "Matrices not Compatible!";
-            }
+            if ((((this->rows != B.rows) && ((this->rows != 1)&&(B.rows != 1)))|| (this->cols != B.cols))){
+                throw "Matrices not Compatible!";}
         }
-        catch (const char *msg) {
+        catch (const char* msg) {
             std::cout << msg << std::endl;
         }
-        Matrix newmat(B.rows, B.cols);
-        if (rows == 1) {
 
-            for (int i = 0; i < B.rows; i++) {
-                for (int j = 0; j < B.cols; j++) {
-                    newmat.data[i * cols + j] = data[j] - B.data[i * cols + j];
+        if (((rows == 1) && (B.rows != 1)) && (cols == B.cols)){
+            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
+            for (int i=0; i<B.rows; i++){
+                for (int j=0; j< B.cols; j++){
+                    newmat.data[i*cols + j] = data[j] - B.data[i*cols+j];
                 }
             }
-        };
-        for (int i = 0; i < B.rows; i++) {
-            for (int j = 0; j < B.cols; j++) {
-                newmat.data[i * cols + j] = data[i * cols + j] - B.data[i * cols + j];
+            return newmat;
+        }
+        
+        if (((B.rows == 1) && (rows != 1)) && (cols == B.cols)){
+            Matrix<typename std::common_type<T,U>::type> newmat(rows,cols);
+            for (int i=0; i<rows; i++){
+                for (int j=0; j< cols; j++){
+                    newmat.data[i*cols + j] = data[i*cols+j] - B.data[j];
+                }
             }
-        };
-        return newmat;
+            return newmat;
+        }  
+        
+        if ((rows == B.rows) && (cols == B.cols)){
+            Matrix<typename std::common_type<T,U>::type> newmat(B.rows,B.cols);
+            for (int i=0; i<B.rows; i++){
+                for (int j=0; j< B.cols; j++){
+                    newmat.data[i*cols + j] = data[i*cols + j] - B.data[i*cols + j];
+                }
+            }
+        
+            return newmat;
+        }
+        
+        else{
+            
+            Matrix<typename std::common_type<T,U>::type> newmat;
+            return newmat;
+        }
     }
 
-    // transpose
     Matrix transpose() const {
         std::cout << "Transpose" << std::endl;
 
@@ -321,7 +362,7 @@ public:
         bias_gradients = Matrix<T>(1, out_features); //zeros
         weights_gradients = Matrix<T>(in_features, out_features); //zeros
         cache = Matrix<T>(n_samples, in_features); //zeros
-        std::cout << weights.rows << std::endl;
+        std::cout << "Weights Rows: "<<weights.rows << std::endl;
     }
 
     // destructor
@@ -330,10 +371,10 @@ public:
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
         std::cout << "Forward Linear Function" << std::endl;
-        std::cout << out_features << std::endl;
-        std::cout << weights.getRows() << std::endl;
-        std::cout << weights.getCols() << std::endl;
-        std::cout << cache.getRows() << std::endl;
+        // std::cout << out_features << std::endl;
+        // std::cout << weights.getRows() << std::endl;
+        // std::cout << weights.getCols() << std::endl;
+        // std::cout << cache.getRows() << std::endl;
         Matrix<T> y = x * weights + bias;
         cache = x;
         return y;
@@ -342,7 +383,19 @@ public:
     // backward function
     virtual Matrix<T> backward(const Matrix<T> &dy) override final {
         std::cout << "Backward Linear Function" << std::endl;
-        Matrix<T> dx = dy * weights.transpose();
+        
+        weights_gradients = cache.transpose()*dy;
+
+        for (int i = 0; i< dy.getCols();i++){
+            double tot = 0;
+            for (int j; j< dy.getRows();j++){
+                tot+=dy[{j,i}];
+                bias_gradients[{0,i}] = tot;
+            }
+        }
+        std::cout<<dy.getRows()<<dy.getCols()<<std::endl;
+        std::cout<<weights.getRows()<<weights.getCols()<<std::endl;
+        Matrix<T> dx = dy*weights.transpose();
         return dx;
     }
 
@@ -362,11 +415,11 @@ class ReLu : public Layer<T> {
 
 public:
 
-    Matrix<T> cache;
-    Matrix<T> bias;
-    Matrix<T> weights;
-    Matrix<T> bias_gradients;
-    Matrix<T> weights_gradient;
+    Matrix<T> cache{};
+    Matrix<T> bias{};
+    Matrix<T> weights{};
+    Matrix<T> bias_gradients{};
+    Matrix<T> weights_gradient{};
 
 
     // default constructor
@@ -388,7 +441,10 @@ public:
 
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
-        Matrix<T> y(x.rows, x.cols);
+        std::cout<<"ReLu Forward"<<std::endl;
+        std::cout<<x.getRows() << std::endl;
+        std::cout<<x.getCols()<<std::endl;
+        Matrix<T> y(x.getRows(), x.getCols());
         std::pair<int, int> index = {0,0};
         for (int i = 0; i < x.rows; i++) {
             for (int j = 0; j < x.cols; j++) {
@@ -541,9 +597,9 @@ T get_accuracy(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
 
 template<typename T>
 void matprint(const Matrix<T> matrix){
-    for (int i=0;i<matrix.getRows(); i++){
-        for(int j = 0;j = matrix.getCols();j++){
-            std::cout<<matrix[{i,j}]<<",";
+    for (int i=0;i<matrix.rows; ++i){
+        for(int j = 0;j <matrix.cols;++j){
+            std::cout<<matrix[{i,j}]<<", ";
         }
     std::cout<<std::endl;
     }
@@ -552,8 +608,21 @@ void matprint(const Matrix<T> matrix){
 
 int main(int argc, char *argv[]) {
     // Your training and testing of the Net class starts here
-
-    // Matrix<double> mat1(2,2,{1,2,3,4});
+    // Matrix<double> C(2,2,{1,2,3,4});
+    // matprint(C);
+    // Matrix<double> A=C; // tests the copy constructor
+    // matprint(A);
+    // Matrix<double> B=std::move(C); // tests the move constructor
+    // matprint(B);
+    
+    
+    // Matrix<double> D,E,F;
+    // D=E; // tests the copy assign operator
+    // D=std::move(F); // tests the move assign operator
+    Matrix<double> mat1(2,2,{1,2,3,4});
+    Matrix<double> mat2(1,2,{1,1});
+    auto mat3 = mat1+mat2;
+    matprint(mat3);
     // std::pair<int, int> pair1(0,1);
     // int x = 3;
     // Matrix<double> mat2 = mat1*x;
