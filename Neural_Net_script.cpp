@@ -312,10 +312,8 @@ public:
         std::cout<<"Forward Linear Function"<<std::endl;
                 std::cout<<out_features<<std::endl;
         std::cout<<weights.getRows()<<std::endl;
+        std::cout<<weights.getCols()<<std::endl;
         std::cout<<cache.getRows()<<std::endl;
-        std::cout<<weights.getRows()<<std::endl;
-        std::cout<<weights.getRows()<<std::endl;
-        std::cout<<weights.getRows()<<std::endl;
         Matrix<T> y=x*weights+bias;
         cache = x;
         return y;
@@ -504,7 +502,10 @@ T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
     return tot/(y_true.getRows()*y_true.getCols());
 }
 
+// template<typename T>
+// void matprint(const Matrix<T> matrix){
 
+// }
 
 int main(int argc, char* argv[])
 {
@@ -533,32 +534,32 @@ int main(int argc, char* argv[])
     // //std::cout<<mat8[pair2]<<std::endl;
 
     // Matrix<double> mat9 = mat3+mat10;
-    // double learning_rate = 0.0005;
-    // int optimizer_steps = 100;
-    // int seed = 1;
-    // Matrix<double> xxor(4,2,{0,0,0,1,1,0,1,1});
-    // Matrix<double> yxor(4,2,{1,0,0,1,0,1,1,0});
-    // int in_features = 2;
-    // int hidden_dim = 100;
-    // int out_features = 2;
-    // int n_samples = 8;
-    // for (int i = 0; i<optimizer_steps; i++){
-    //     std::cout<<i<<std::endl;
-    // Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
+    double learning_rate = 0.0005;
+    int optimizer_steps = 100;
+    int seed = 1;
+    Matrix<double> xxor(4,2,{0,0,0,1,1,0,1,1});
+    Matrix<double> yxor(4,2,{1,0,0,1,0,1,1,0});
+    int in_features = 2;
+    int hidden_dim = 100;
+    int out_features = 2;
+    int n_samples = 8;
+    for (int i = 0; i<optimizer_steps; i++){
+        std::cout<<i<<std::endl;
+    Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
     
-    // Matrix<double> fwd_step = net.forward(xxor);
+    Matrix<double> fwd_step = net.forward(xxor);
     
-    // double loss = MSEloss(yxor,fwd_step);
-    // std::cout<<loss<<std::endl;
+    double loss = MSEloss(yxor,fwd_step);
+    std::cout<<loss<<std::endl;
     
-    // Matrix<double> gradmat = MSEgrad(yxor,fwd_step);
+    Matrix<double> gradmat = MSEgrad(yxor,fwd_step);
     
-    // Matrix<double> back_step = net.backward(gradmat);
+    Matrix<double> back_step = net.backward(gradmat);
     
-    // net.optimize(learning_rate);
+    net.optimize(learning_rate);
     
-    // double acc = get_accuracy(yxor,back_step);
-    // std::cout<<acc<<std::endl;
-    // }
+    double acc = get_accuracy(yxor,back_step);
+    std::cout<<acc<<std::endl;
+    }
     return 0;
 }
