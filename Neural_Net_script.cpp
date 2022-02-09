@@ -347,7 +347,7 @@ public:
     virtual Matrix<T> backward(const Matrix<T> &dy) override final {
         std::cout << "Backward Linear Function----------------------------------" << std::endl;
 
-        weights_gradients = cache.transpose() * dy;
+        this->weights_gradients = cache.transpose() * dy;
 
         for (int i = 0; i < dy.getCols(); i++) {
             double tot = 0;
@@ -437,6 +437,7 @@ public:
             }
 
         }
+        matprint(dx);
         return dx;
     }
 
@@ -545,7 +546,7 @@ Matrix<T> argmax(const Matrix<T> &y) {
     // Your implementation of the argmax function starts here
     std::cout<<"Calculating argmax--------------"<<std::endl;
     Matrix<T> matmax(1, y.getRows());
-    for (int i = 0; i < y.rows; i++) {
+    for (int i = 0; i < y.getRows(); i++) {
         T indmax = 0;
         T valmax = 0;
         for (int j = 0; j < y.cols; j++) {
@@ -554,24 +555,36 @@ Matrix<T> argmax(const Matrix<T> &y) {
         matmax[{0, i}] = indmax;
 
     }
+    matprint(matmax);
     return matmax;
 }
 
 // Calculate the accuracy of the prediction, using the argmax
 template<typename T>
-T get_accuracy(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
-    // Your implementation of the get_accuracy starts here
-    Matrix<T> matmax_true_args = argmax(y_true);
-    Matrix<T> matmax_pred_args = argmax(y_pred);
-    double tot = 0;
-    std::cout<<"Accuracy Calculating-------------"<<std::endl;
-    for (int i = 0; i < y_true.getRows(); i++) {
-        tot += (y_true[{i, matmax_true_args[{0,i}]}] - y_pred[{i, matmax_pred_args[{0,i}]}]) / y_true[{i, matmax_true_args[{0,i}]}];
+// T get_accuracy(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
+//     // Your implementation of the get_accuracy starts here
+//     Matrix<T> matmax_true_args = argmax(y_true);
+//     Matrix<T> matmax_pred_args = argmax(y_pred);
+//     double tot = 0;
+//     std::cout<<"Accuracy Calculating-------------"<<std::endl;
+//     for (int i = 0; i < y_true.getRows(); i++) {
+//         tot += abs(y_true[{i, matmax_true_args[{0,i}]}] - y_pred[{i, matmax_pred_args[{0,i}]}]) / y_true[{i, matmax_true_args[{0,i}]}];
         
+//     }
+//     return tot / (y_true.getRows());
+// }
+T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
+{
+    Matrix<T> argmax_true = argmax(y_true);
+    Matrix<T> argmax_pred = argmax(y_pred);
+    int counter_true = 0;
+    for (int i = 0; i < y_true.cols; i++) {
+        if (y_true[{0, i}] == y_pred[{0, i}]) {
+            counter_true += 1;
+        }
     }
-    return tot / (y_true.getRows());
+    return counter_true / (y_true.cols);
 }
-
 template<typename T>
 void matprint(const Matrix<T> matrix) {
     for (int i = 0; i < matrix.rows; ++i) {
@@ -623,7 +636,7 @@ int main(int argc, char *argv[]) {
 
     // Matrix<double> mat9 = mat3+mat10;
     double learning_rate = 0.0005;
-    int optimizer_steps = 100;
+    int optimizer_steps = 1;
     int seed = 1;
     Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
     Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
