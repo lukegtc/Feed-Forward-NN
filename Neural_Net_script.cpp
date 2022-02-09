@@ -24,7 +24,7 @@ public:
         data = nullptr;
     }
 
-    Matrix(int rows, int cols) : rows(rows), cols(cols), data(new double[rows * cols]{0}) {
+    Matrix(int rows, int cols) : rows(rows), cols(cols) {
         // std::cout << "Matrix Created" << std::endl;
 
     }
