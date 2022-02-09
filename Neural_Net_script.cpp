@@ -24,9 +24,9 @@ public:
         data = nullptr;
     }
 
-    Matrix(int rows, int cols) : rows(rows), cols(cols), data(new double[rows * cols]{0}) {
+    Matrix(int rows, int cols) : rows(rows), cols(cols){
         // std::cout << "Matrix Created" << std::endl;
-
+    this -> data = new double[rows * cols]{0};
     }
 
     Matrix(int rows, int cols, const std::initializer_list<T> &list) : Matrix(rows, cols) {
@@ -546,7 +546,7 @@ Matrix<T> argmax(const Matrix<T> &y) {
     std::cout<<"Calculating argmax--------------"<<std::endl;
     Matrix<T> matmax(1, y.getRows());
     for (int i = 0; i < y.rows; i++) {
-        T indmax;
+        T indmax = 0;
         T valmax = 0;
         for (int j = 0; j < y.cols; j++) {
             if (y[{i, j}] > valmax) { indmax = j; }
