@@ -585,17 +585,18 @@ void matprint(const Matrix<T> matrix) {
 
 int main(int argc, char *argv[]) {
     // Your training and testing of the Net class starts here
-    // Matrix<double> C(2, 2, {1, 2, 3, 4});
-    // matprint(C);
-    // Matrix<double> A = C; // tests the copy constructor
-    // matprint(A);
-    // Matrix<double> B = std::move(C); // tests the move constructor
-    // matprint(B);
+    Matrix<double> C(2, 2, {1, 2, 3, 4});
+    matprint(C);
+    Matrix<double> A = C; // tests the copy constructor
+    matprint(A);
+    Matrix<double> B = std::move(C); // tests the move constructor
+    matprint(B);
 
 
-    // Matrix<double> D, E, F;
-    // D = E; // tests the copy assign operator
-    // D = std::move(F); // tests the move assign operator
+    Matrix<double> D(2,2,{1,2,3,4}), E(2,2,{5,6,7,8}), F(2,2,{9,10,11,12});
+    D = E; // tests the copy assign operator
+    D = std::move(F); // tests the move assign operator
+    matprint(D);
     // Matrix<double> mat1(2, 2, {1, 2, 3, 4});
     // Matrix<double> mat2(1, 2, {1, 1});
     // auto mat3 = mat1 + mat2;
@@ -622,36 +623,36 @@ int main(int argc, char *argv[]) {
     // //std::cout<<mat8[pair2]<<std::endl;
 
     // Matrix<double> mat9 = mat3+mat10;
-    double learning_rate = 0.0005;
-    int optimizer_steps = 100;
-    int seed = 1;
-    Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
-    Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
-    int in_features = 2;
-    int hidden_dim = 100;
-    int out_features = 2;
-    int n_samples = 8;
+    // double learning_rate = 0.0005;
+    // int optimizer_steps = 100;
+    // int seed = 1;
+    // Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
+    // Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
+    // int in_features = 2;
+    // int hidden_dim = 100;
+    // int out_features = 2;
+    // int n_samples = 8;
 
-    Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
+    // Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
 
-    for (int i = 0; i < optimizer_steps; i++) {
-        std::cout << "-------------------------------------------" << std::endl;
-        std::cout << "Step: " << i << std::endl;
-        std::cout << "Forward Step" << std::endl;
-        Matrix<double> fwd_step = net.forward(xxor);
+    // for (int i = 0; i < optimizer_steps; i++) {
+    //     std::cout << "-------------------------------------------" << std::endl;
+    //     std::cout << "Step: " << i << std::endl;
+    //     std::cout << "Forward Step" << std::endl;
+    //     Matrix<double> fwd_step = net.forward(xxor);
 
-        double loss = MSEloss(yxor, fwd_step);
-        std::cout << loss << std::endl;
+    //     double loss = MSEloss(yxor, fwd_step);
+    //     std::cout << loss << std::endl;
 
-        Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
+    //     Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
 
-        Matrix<double> back_step = net.backward(gradmat);
-        std::cout << "Optimizing--------------------------------" << std::endl;
-        net.optimize(learning_rate);
+    //     Matrix<double> back_step = net.backward(gradmat);
+    //     std::cout << "Optimizing--------------------------------" << std::endl;
+    //     net.optimize(learning_rate);
 
-        double acc = get_accuracy(yxor, back_step);
-        std::cout << acc << std::endl;
-    }
+    //     double acc = get_accuracy(yxor, back_step);
+    //     std::cout << acc << std::endl;
+    // }
 
     return 0;
 }
