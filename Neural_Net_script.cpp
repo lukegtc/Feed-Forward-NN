@@ -24,7 +24,7 @@ public:
         data = nullptr;
     }
 
-    Matrix(int rows, int cols) : rows(rows), cols(cols) {
+    Matrix(int rows, int cols) : rows(rows), cols(cols), data(new double[rows * cols]{0}) {
         // std::cout << "Matrix Created" << std::endl;
 
     }
@@ -47,7 +47,7 @@ public:
         rows = other.rows;
         cols = other.cols;
 
-        delete[] data;
+        // delete[] data;
         data = other.data;
         other.rows = 0;
         other.cols = 0;
@@ -593,10 +593,9 @@ int main(int argc, char *argv[]) {
     // matprint(B);
 
 
-    // Matrix<double> D(2,2,{1,2,3,4}), E(2,2,{5,6,7,8}), F(2,2,{9,10,11,12});
+    // Matrix<double> D, E, F;
     // D = E; // tests the copy assign operator
     // D = std::move(F); // tests the move assign operator
-    // matprint(D);
     // Matrix<double> mat1(2, 2, {1, 2, 3, 4});
     // Matrix<double> mat2(1, 2, {1, 1});
     // auto mat3 = mat1 + mat2;
