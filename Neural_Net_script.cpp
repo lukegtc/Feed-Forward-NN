@@ -30,7 +30,7 @@ public:
     }
 
     Matrix(int rows, int cols, const std::initializer_list<T> &list) : Matrix(rows, cols) {
-        std::cout << "Filled Matrix Created" << std::endl;
+        // std::cout << "Filled Matrix Created" << std::endl;
         try {
             if (rows * cols != (int) list.size()) {
                 throw "List length does not fit the matrix dimensions!";
@@ -52,7 +52,7 @@ public:
         other.rows = 0;
         other.cols = 0;
         other.data = nullptr;
-        std::cout << "Move Constructor" << std::endl;
+        // std::cout << "Move Constructor" << std::endl;
     }
 
     // Copy Constructor IT WAS THIS ALL ALONG ARGHHHH-------------------------------
@@ -63,7 +63,7 @@ public:
                 data[i * cols + j] = other.data[i * cols + j];
             }
         }
-        std::cout << "Copy Constructor" << std::endl;
+        // std::cout << "Copy Constructor" << std::endl;
     }
 
     // Destructor
@@ -79,7 +79,7 @@ public:
 
     // Copy assignment operator
     Matrix &operator=(const Matrix &other) {
-        std::cout << "Copy Assignment Operator" << std::endl;
+        // std::cout << "Copy Assignment Operator" << std::endl;
         if (&other == this) {
             return *this;
         }
@@ -98,7 +98,7 @@ public:
 
     // Move assignment operator
     Matrix &operator=(Matrix &&other) noexcept {
-        std::cout << "Move Assignment Operator" << std::endl;
+        // std::cout << "Move Assignment Operator" << std::endl;
         if (this != &other) {
 
             delete[] data;
@@ -117,8 +117,15 @@ public:
     // access operator
     T &operator[](const std::pair<int, int> &ij) {
         // std::cout<<"Access Operator"<<std::endl;
+
         try {
             if ((ij.first > rows) || (ij.second > cols)) {
+                // std::cout<<"Rows||Cols"<<std::endl;
+                // std::cout<<rows<<", "<<cols<<std::endl;
+                // std::cout<<ij.first<<", "<<ij.second<<std::endl;
+                        for (int i = 0; i<rows*cols;i++){
+            // std::cout<<data[i]<<std::endl;
+        }
                 throw "Exceeds Dimensions!";
             }
         }
@@ -149,7 +156,7 @@ public:
     // Scalar Multiplication Operator
     template<typename U>
     Matrix<typename std::common_type<T, U>::type> operator*(U x) const {
-        std::cout << "Scalar Multiplication Operator" << std::endl;
+        // std::cout << "Scalar Multiplication Operator" << std::endl;
         Matrix<T> newmat(rows, cols);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -162,7 +169,7 @@ public:
     // Matrix Multiplication Operator
     template<typename U>
     Matrix<typename std::common_type<T, U>::type> operator*(const Matrix<U> &B) const {
-        std::cout << "Matrix Multiplication Operator" << std::endl;
+        // std::cout << "Matrix Multiplication Operator" << std::endl;
 
         if (cols != B.getRows()) {
             throw("Multiplication between Matrices not Compatible!");
@@ -239,7 +246,7 @@ public:
     }
 
     Matrix transpose() const {
-        std::cout << "Transpose" << std::endl;
+        // std::cout << "Transpose" << std::endl;
 
         Matrix newmat(cols, rows);
         for (int i = 0; i < rows; i++) {
@@ -297,7 +304,7 @@ public:
     // constructor
     Linear(int in_features, int out_features, int n_samples, int seed) :
             in_features(in_features), out_features(out_features), n_samples(n_samples), seed(seed) {
-        std::cout << "Linear Layer Constructed" << std::endl;
+        std::cout << "Linear Layer Constructed-------------------------" << std::endl;
 
         std::default_random_engine generator(seed);
         std::normal_distribution<T> distribution_normal(0.0, 1.0);
@@ -326,7 +333,7 @@ public:
 
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
-        std::cout << "Forward Linear Function" << std::endl;
+        std::cout << "Forward Linear Function-------------------------------" << std::endl;
         // std::cout << out_features << std::endl;
         // std::cout << weights.getRows() << std::endl;
         // std::cout << weights.getCols() << std::endl;
@@ -338,7 +345,7 @@ public:
 
     // backward function
     virtual Matrix<T> backward(const Matrix<T> &dy) override final {
-        std::cout << "Backward Linear Function" << std::endl;
+        std::cout << "Backward Linear Function----------------------------------" << std::endl;
 
         weights_gradients = cache.transpose() * dy;
 
@@ -349,7 +356,7 @@ public:
                 this->bias_gradients[{0, i}] = tot;
             }
         }
-        matprint(bias_gradients);
+        // matprint(bias_gradients);
         // std::cout<<dy.getRows()<<dy.getCols()<<std::endl;
         // std::cout<<weights.getRows()<<weights.getCols()<<std::endl;
         Matrix<T> result = dy * weights.transpose();
@@ -358,8 +365,13 @@ public:
 
     // optimize function
     void optimize(T learning_rate) {
+        std::cout<<"Linear Optimizer--------------"<<std::endl;
         weights = weights - weights_gradients * learning_rate;
+        // std::cout<<"Bias Matrix"<<std::endl;
+        // matprint(bias);
+        // matprint(bias_gradients);
         bias = bias - bias_gradients * learning_rate;
+        // matprint(bias);
     }
 
 };
@@ -385,7 +397,7 @@ public:
             in_features(in_features_), out_features(out_features_),
             n_samples(n_samples_), cache(Matrix<T>(n_samples, in_features)) {
 
-        std::cout << "ReLu Layer Constructed" << std::endl;
+        std::cout << "ReLu Layer Constructed------------------------------------" << std::endl;
     }
 
     // destructor
@@ -393,7 +405,7 @@ public:
 
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
-        std::cout << "ReLu Forward" << std::endl;
+        std::cout << "ReLu Forward-------------------------------------------------" << std::endl;
         // std::cout << x.getRows() << std::endl;
         // std::cout << x.getCols() << std::endl;
         Matrix<T> y(x.getRows(), x.getCols());
@@ -410,6 +422,7 @@ public:
 
     // backward function
     virtual Matrix<T> backward(const Matrix<T> &dy) override final {
+        std::cout<<"ReLu Backward-----------------"<<std::endl;
         Matrix<T> dx(dy.getRows(), dy.getCols());
         std::pair<int, int> index = {0, 0};
         for (int i = 0; i < dy.getRows(); i++) {
@@ -451,7 +464,7 @@ public:
         linear1 = Linear<T>(in_features, hidden_dim, n_samples, seed);
         relu = ReLu<T>(hidden_dim, hidden_dim, n_samples);
         linear2 = Linear<T>(hidden_dim, out_features, n_samples, seed);
-        std::cout << "Net Constructed" << std::endl;
+        std::cout << "Net Constructed----------------" << std::endl;
     }
 
     // destructor
@@ -476,7 +489,9 @@ public:
 
     // optimize
     void optimize(T learning_rate) {
+        std::cout<<"Optimizing First Layer-----------"<<std::endl;
         linear1.optimize(learning_rate);
+        std::cout<<"Optimizing Second Layer------------"<<std::endl;
         linear2.optimize(learning_rate);
     }
 };
@@ -528,7 +543,8 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
 template<typename T>
 Matrix<T> argmax(const Matrix<T> &y) {
     // Your implementation of the argmax function starts here
-    Matrix<T> matmax(1, y.getCols());
+    std::cout<<"Calculating argmax--------------"<<std::endl;
+    Matrix<T> matmax(1, y.getRows());
     for (int i = 0; i < y.rows; i++) {
         T indmax;
         T valmax = 0;
@@ -545,15 +561,15 @@ Matrix<T> argmax(const Matrix<T> &y) {
 template<typename T>
 T get_accuracy(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     // Your implementation of the get_accuracy starts here
-    Matrix<T> matmax_true = argmax(y_true);
-    Matrix<T> matmax_pred = argmax(y_pred);
+    Matrix<T> matmax_true_args = argmax(y_true);
+    Matrix<T> matmax_pred_args = argmax(y_pred);
     double tot = 0;
+    std::cout<<"Accuracy Calculating-------------"<<std::endl;
     for (int i = 0; i < y_true.getRows(); i++) {
-        for (int j = 0; j < y_true.getCols(); j++) {
-            tot += (matmax_true[{i, j}] - matmax_pred[{i, j}]) / matmax_true[{i, j}];
-        }
+        tot += (y_true[{i, matmax_true_args[{0,i}]}] - y_pred[{i, matmax_pred_args[{0,i}]}]) / y_true[{i, matmax_true_args[{0,i}]}];
+        
     }
-    return tot / (y_true.getRows() * y_true.getCols());
+    return tot / (y_true.getRows());
 }
 
 template<typename T>
@@ -577,13 +593,13 @@ int main(int argc, char *argv[]) {
     // matprint(B);
 
 
-    Matrix<double> D, E, F;
-    D = E; // tests the copy assign operator
-    D = std::move(F); // tests the move assign operator
-    Matrix<double> mat1(2, 2, {1, 2, 3, 4});
-    Matrix<double> mat2(1, 2, {1, 1});
-    auto mat3 = mat1 + mat2;
-    matprint(mat3);
+    // Matrix<double> D, E, F;
+    // D = E; // tests the copy assign operator
+    // D = std::move(F); // tests the move assign operator
+    // Matrix<double> mat1(2, 2, {1, 2, 3, 4});
+    // Matrix<double> mat2(1, 2, {1, 1});
+    // auto mat3 = mat1 + mat2;
+    // matprint(mat3);
     // std::pair<int, int> pair1(0,1);
     // int x = 3;
     // Matrix<double> mat2 = mat1*x;
@@ -630,7 +646,7 @@ int main(int argc, char *argv[]) {
         Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
 
         Matrix<double> back_step = net.backward(gradmat);
-        std::cout << "Optimizing" << std::endl;
+        std::cout << "Optimizing--------------------------------" << std::endl;
         net.optimize(learning_rate);
 
         double acc = get_accuracy(yxor, back_step);
