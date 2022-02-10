@@ -55,7 +55,7 @@ public:
         // std::cout << "Move Constructor" << std::endl;
     }
 
-    // Copy Constructor IT WAS THIS ALL ALONG ARGHHHH-------------------------------
+    // Copy Constructor 
     Matrix(Matrix &other) : Matrix(other.rows, other.cols) {
         //     double matrix[other.rows][other.columns] = {0};
         for (int i = 0; i < other.rows; i++) {
@@ -123,9 +123,7 @@ public:
                 // std::cout<<"Rows||Cols"<<std::endl;
                 // std::cout<<rows<<", "<<cols<<std::endl;
                 // std::cout<<ij.first<<", "<<ij.second<<std::endl;
-                        for (int i = 0; i<rows*cols;i++){
-            // std::cout<<data[i]<<std::endl;
-        }
+    
                 throw "Exceeds Dimensions!";
             }
         }
@@ -407,6 +405,12 @@ public:
             in_features(in_features), out_features(out_features),
             n_samples(n_samples) {
             cache = Matrix<T>(n_samples, in_features);
+            try {
+            if (in_features != out_features) throw "In features and out features must be the same!";
+            }
+            catch (const char *msg) {
+            std::cout << msg << std::endl;
+        }
         std::cout << "ReLu Layer Constructed------------------------------------" << std::endl;
     }
 
@@ -618,9 +622,11 @@ Matrix<double> mat2(2,2,{1,2,3,2});
 std::cout<<get_accuracy(mat1,mat2)<<std::endl;;
 }
 void relu_test(){
-    ReLU<double> relu(3,3,3);
+    ReLU<double> relu(3,2,3);
     Matrix<double> mat1(2,2,{1,2,3,4});
     Matrix<double> mat2(2,2,{1,2,3,4});
+    relu.forward(mat1);
+    
 }
 void mat_class_test(){
     Matrix<double> C(2, 2, {1, 2, 3, 4});
@@ -631,9 +637,15 @@ void mat_class_test(){
     matprint(B);
 
 
-    Matrix<double> D, E, F;
+    Matrix<double> D, F;
+    Matrix<double> E(2,2,{1,2,3,4});
     D = E; // tests the copy assign operator
     D = std::move(F); // tests the move assign operator
+
+    matprint(D);
+    // Access Operator Tests
+    Matrix<double> G(2,2,{2,4,6,8});
+
 
 }
 int main(int argc, char *argv[]) {
@@ -666,36 +678,37 @@ int main(int argc, char *argv[]) {
 
     // Matrix<double> mat9 = mat3+mat10;
     // acc_test();
-    double learning_rate = 0.0005;
-    int optimizer_steps = 100;
-    int seed = 1;
-    Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
-    Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
-    int in_features = 2;
-    int hidden_dim = 10;
-    int out_features = 2;
-    int n_samples = 8;
+    relu_test();
+    // double learning_rate = 0.0005;
+    // int optimizer_steps = 100;
+    // int seed = 1;
+    // Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
+    // Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
+    // int in_features = 2;
+    // int hidden_dim = 10;
+    // int out_features = 2;
+    // int n_samples = 4;
 
-    Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
+    // Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
 
-    for (int i = 0; i < optimizer_steps; i++) {
-        std::cout << "-------------------------------------------" << std::endl;
-        std::cout << "Step: " << i << std::endl;
-        std::cout << "Forward Step" << std::endl;
-        Matrix<double> fwd_step = net.forward(xxor);
+    // for (int i = 0; i < optimizer_steps; i++) {
+    //     std::cout << "-------------------------------------------" << std::endl;
+    //     std::cout << "Step: " << i << std::endl;
+    //     std::cout << "Forward Step" << std::endl;
+    //     Matrix<double> fwd_step = net.forward(xxor);
 
-        double loss = MSEloss(yxor, fwd_step);
-        std::cout << loss << std::endl;
+    //     double loss = MSEloss(yxor, fwd_step);
+    //     std::cout << loss << std::endl;
 
-        Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
+    //     Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
 
-        Matrix<double> back_step = net.backward(gradmat);
-        std::cout << "Optimizing--------------------------------" << std::endl;
-        net.optimize(learning_rate);
+    //     Matrix<double> back_step = net.backward(gradmat);
+    //     std::cout << "Optimizing--------------------------------" << std::endl;
+    //     net.optimize(learning_rate);
 
-        double acc = get_accuracy(yxor, back_step);
-        std::cout << acc << std::endl;
-    }
+    //     double acc = get_accuracy(yxor, back_step);
+    //     std::cout << acc << std::endl;
+    // }
 
     return 0;
 }
