@@ -387,31 +387,31 @@ public:
 };
 
 template<typename T>
-class ReLu : public Layer<T> {
+class ReLU : public Layer<T> {
 
     int in_features{};
     int out_features{};
     int n_samples{};
-    Matrix<T> cache;
+    Matrix<T> cache{};
 
 public:
 
 
     // default constructor
-    ReLu() {
+    ReLU() {
         in_features = out_features = n_samples = 0;
     }
 
     // constructor
-    ReLu(int in_features_, int out_features_, int n_samples_) :
-            in_features(in_features_), out_features(out_features_),
-            n_samples(n_samples_), cache(Matrix<T>(n_samples, in_features)) {
-
+    ReLU(int in_features, int out_features, int n_samples) :
+            in_features(in_features), out_features(out_features),
+            n_samples(n_samples) {
+            cache = Matrix<T>(n_samples, in_features);
         std::cout << "ReLu Layer Constructed------------------------------------" << std::endl;
     }
 
     // destructor
-    ~ReLu() = default; //watch out????
+    ~ReLU() = default; //watch out????
 
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
@@ -460,22 +460,26 @@ template<typename T>
 class Net {
     // Your implementation of the Net class starts here
     // default constructor
-
+    int in_features{};
+    int hidden_dim{};
+    int out_features{};
+    int n_samples{};
+    int seed{};
     Linear<T> linear1{};
-    ReLu<T> relu{};
+    ReLU<T> relu{};
     Linear<T> linear2{};
 
 public:
 
 
     Net() {
-
+        in_features = out_features= hidden_dim = n_samples = seed= 0;
     }
 
     // constructor
-    Net(int in_features, int hidden_dim, int out_features, int n_samples, int seed) {
+    Net(int in_features, int hidden_dim, int out_features, int n_samples, int seed): in_features(in_features), out_features(out_features), n_samples(n_samples), seed(seed)  {
         linear1 = Linear<T>(in_features, hidden_dim, n_samples, seed);
-        relu = ReLu<T>(hidden_dim, hidden_dim, n_samples);
+        relu = ReLU<T>(hidden_dim, hidden_dim, n_samples);
         linear2 = Linear<T>(hidden_dim, out_features, n_samples, seed);
         std::cout << "Net Constructed----------------" << std::endl;
     }
@@ -489,7 +493,6 @@ public:
         Matrix<T> matrelu = relu.forward(matlinear1);
         Matrix<T> matlinear2 = linear2.forward(matrelu);
         return matlinear2;
-
     }
 
     // backward function
@@ -546,7 +549,7 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
         for (int j = 0; j < y_pred.getCols(); j++) {
             index.first = i;
             index.second = j;
-            grad_mat[index] = 2 * (y_pred[index] - y_true[index]);
+            grad_mat[index] = 2 * (y_pred[index] - y_true[index])/(y_true.getRows()*y_true.getCols());
         }
     }
     return grad_mat;
@@ -614,19 +617,28 @@ Matrix<double> mat1(2,2,{1,2,3,4});
 Matrix<double> mat2(2,2,{1,2,3,2});
 std::cout<<get_accuracy(mat1,mat2)<<std::endl;;
 }
+void relu_test(){
+    ReLU<double> relu(3,3,3);
+    Matrix<double> mat1(2,2,{1,2,3,4});
+    Matrix<double> mat2(2,2,{1,2,3,4});
+}
+void mat_class_test(){
+    Matrix<double> C(2, 2, {1, 2, 3, 4});
+    matprint(C);
+    Matrix<double> A = C; // tests the copy constructor
+    matprint(A);
+    Matrix<double> B = std::move(C); // tests the move constructor
+    matprint(B);
+
+
+    Matrix<double> D, E, F;
+    D = E; // tests the copy assign operator
+    D = std::move(F); // tests the move assign operator
+
+}
 int main(int argc, char *argv[]) {
     // Your training and testing of the Net class starts here
-    // Matrix<double> C(2, 2, {1, 2, 3, 4});
-    // matprint(C);
-    // Matrix<double> A = C; // tests the copy constructor
-    // matprint(A);
-    // Matrix<double> B = std::move(C); // tests the move constructor
-    // matprint(B);
 
-
-    // Matrix<double> D, E, F;
-    // D = E; // tests the copy assign operator
-    // D = std::move(F); // tests the move assign operator
     // Matrix<double> mat1(2, 2, {1, 2, 3, 4});
     // Matrix<double> mat2(1, 2, {1, 1});
     // auto mat3 = mat1 + mat2;
