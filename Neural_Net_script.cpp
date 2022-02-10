@@ -8,27 +8,27 @@
 #include <utility>
 #include <cassert>
 
+// Matrix Class
 template<typename T>
 class Matrix {
-    // Your implementation of the Matrix class starts here
-    double *data;
+    // Pointer that points to the list of values
+    double *data; 
 public:
+
     int rows;
     int cols;
-    // std::initializer_list<T>& list;
-
-    // std::vector<T>& matrix;
+// Default Constructor
     Matrix() {
         rows = 0;
         cols = 0;
         data = nullptr;
     }
-
+// Constructor that initializes an empty matrix if rows and columns are provided
     Matrix(int rows, int cols) : rows(rows), cols(cols){
         // std::cout << "Matrix Created" << std::endl;
     this -> data = new double[rows * cols]{0};
     }
-
+// Constructor that fills the MAtrix with values
     Matrix(int rows, int cols, const std::initializer_list<T> &list) : Matrix(rows, cols) {
         // std::cout << "Filled Matrix Created" << std::endl;
         try {
@@ -42,7 +42,7 @@ public:
         std::uninitialized_copy(list.begin(), list.end(), data);
     }
 
-    // Move Constructor :rows(other.rows),cols(other.cols),list(other.list)
+    // Move Constructor 
     Matrix(Matrix &&other) {
         rows = other.rows;
         cols = other.cols;
@@ -156,6 +156,7 @@ public:
     Matrix<typename std::common_type<T, U>::type> operator*(U x) const {
         // std::cout << "Scalar Multiplication Operator" << std::endl;
         Matrix<T> newmat(rows, cols);
+        // Cycles through the values in the matrix and multiplies each by the scalar provided
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 newmat[{i, j}] = data[i * cols + j] * x;
@@ -168,13 +169,18 @@ public:
     template<typename U>
     Matrix<typename std::common_type<T, U>::type> operator*(const Matrix<U> &B) const {
         // std::cout << "Matrix Multiplication Operator" << std::endl;
-
+        try{
         if (cols != B.getRows()) {
-            throw("Multiplication between Matrices not Compatible!");
+            throw "Multiplication between Matrices not Compatible!";
+        }
+        }
+        catch (const char *msg) {
+            std::cout << msg << std::endl;
         }
         Matrix<T> newmat(rows, B.cols);
 
         // std::cout << newmat.getRows() << " " << newmat.getCols() << std::endl;
+        // Multiplies the Matrices with the AxB * BxC = AxC
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < B.cols; j++) {
                 double temp_sum = 0;
@@ -190,7 +196,7 @@ public:
         return newmat;
     }
 
-// arithmetic operator Matrix + Matrix
+// Addition Operator
     template<typename U>
     Matrix<typename std::common_type<T, U>::type> operator+(const Matrix<U> &B) const {
         try {
@@ -237,7 +243,7 @@ public:
         }
     }
 
-    // arithmetic operator Matrix - Matrix chew
+    // Subtraction Operator
     template<typename U>
     Matrix<typename std::common_type<T, U>::type> operator-(const Matrix<U> &B) const {
         return this->template operator+(B*(-1));
@@ -280,7 +286,7 @@ public:
 
 template<typename T>
 class Linear : public Layer<T> {
-
+// Private Variables
     int in_features{};
     int out_features{};
     int n_samples{};
@@ -386,7 +392,7 @@ public:
 
 template<typename T>
 class ReLU : public Layer<T> {
-
+// Private Variables
     int in_features{};
     int out_features{};
     int n_samples{};
