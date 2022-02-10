@@ -340,6 +340,7 @@ public:
         // std::cout << cache.getRows() << std::endl;
         Matrix<T> y = x * weights + bias;
         cache = x;
+        matprint(y);
         return y;
     }
 
@@ -348,7 +349,7 @@ public:
         std::cout << "Backward Linear Function----------------------------------" << std::endl;
 
         this->weights_gradients = cache.transpose() * dy;
-
+        // this-> bias_gradients = dy;
         for (int i = 0; i < dy.getCols(); i++) {
             double tot = 0;
             for (int j = 0; j < dy.getRows(); j++) {
@@ -360,6 +361,12 @@ public:
         // std::cout<<dy.getRows()<<dy.getCols()<<std::endl;
         // std::cout<<weights.getRows()<<weights.getCols()<<std::endl;
         Matrix<T> result = dy * weights.transpose();
+        std::cout<<"------------------------------Weights Gradients------------------------------"<<std::endl;
+        matprint(weights_gradients);
+        std::cout<<"------------------------------Loss Gradient------------------------------"<<std::endl;
+        matprint(result);
+        std::cout<<"------------------------------Bias Gradients------------------------------"<<std::endl;
+        matprint(bias_gradients);
         return result;
     }
 
@@ -367,11 +374,14 @@ public:
     void optimize(T learning_rate) {
         std::cout<<"Linear Optimizer--------------"<<std::endl;
         weights = weights - weights_gradients * learning_rate;
+        std::cout<<"------------------------------Weights Optimized------------------------------"<<std::endl;
+        matprint(weights);
         // std::cout<<"Bias Matrix"<<std::endl;
         // matprint(bias);
         // matprint(bias_gradients);
         bias = bias - bias_gradients * learning_rate;
-        // matprint(bias);
+        std::cout<<"------------------------------Bias Optimized------------------------------"<<std::endl;
+        matprint(bias);
     }
 
 };
@@ -382,7 +392,7 @@ class ReLu : public Layer<T> {
     int in_features{};
     int out_features{};
     int n_samples{};
-    Matrix<T> cache{};
+    Matrix<T> cache;
 
 public:
 
@@ -417,6 +427,7 @@ public:
                 y[index] = std::max(0.0, x[index]);
             }
         }
+        matprint(y);
         return y;
     }
 
@@ -432,11 +443,12 @@ public:
                 if (cache[index] < 0) {
                     dx[index] = 0;
                 } else {
-                    dx[index] = dy[index];
+                    dx[index] = 1; // changed dy[index] to 1
                 } //CHECK THIS ---------------------------------------------------
             }
 
         }
+        std::cout<<"------------------------------ReLu Gradient------------------------------"<<std::endl;
         matprint(dx);
         return dx;
     }
@@ -547,10 +559,10 @@ Matrix<T> argmax(const Matrix<T> &y) {
     std::cout<<"Calculating argmax--------------"<<std::endl;
     Matrix<T> matmax(1, y.getRows());
     for (int i = 0; i < y.getRows(); i++) {
-        T indmax = 0;
+        int indmax = 0;
         T valmax = 0;
         for (int j = 0; j < y.cols; j++) {
-            if (y[{i, j}] > valmax) { indmax = j; }
+            if (y[{i, j}] > valmax) { indmax = j; valmax = y[{i,j}]; }
         }
         matmax[{0, i}] = indmax;
 
@@ -560,7 +572,7 @@ Matrix<T> argmax(const Matrix<T> &y) {
 }
 
 // Calculate the accuracy of the prediction, using the argmax
-template<typename T>
+// template<typename T>
 // T get_accuracy(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
 //     // Your implementation of the get_accuracy starts here
 //     Matrix<T> matmax_true_args = argmax(y_true);
@@ -573,6 +585,7 @@ template<typename T>
 //     }
 //     return tot / (y_true.getRows());
 // }
+template<typename T>
 T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
 {
     Matrix<T> argmax_true = argmax(y_true);
@@ -596,6 +609,11 @@ void matprint(const Matrix<T> matrix) {
 
 }
 
+void acc_test(){
+Matrix<double> mat1(2,2,{1,2,3,4});
+Matrix<double> mat2(2,2,{1,2,3,2});
+std::cout<<get_accuracy(mat1,mat2)<<std::endl;;
+}
 int main(int argc, char *argv[]) {
     // Your training and testing of the Net class starts here
     // Matrix<double> C(2, 2, {1, 2, 3, 4});
@@ -635,13 +653,14 @@ int main(int argc, char *argv[]) {
     // //std::cout<<mat8[pair2]<<std::endl;
 
     // Matrix<double> mat9 = mat3+mat10;
+    // acc_test();
     double learning_rate = 0.0005;
-    int optimizer_steps = 1;
+    int optimizer_steps = 100;
     int seed = 1;
     Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
     Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
     int in_features = 2;
-    int hidden_dim = 100;
+    int hidden_dim = 10;
     int out_features = 2;
     int n_samples = 8;
 
