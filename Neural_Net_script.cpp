@@ -12,9 +12,9 @@
 template<typename T>
 class Matrix {
     // Pointer that points to the list of values
-    double *data; 
+    
 public:
-
+    T *data; 
     int rows;
     int cols;
 // Default Constructor
@@ -26,7 +26,7 @@ public:
 // Constructor that initializes an empty matrix if rows and columns are provided
     Matrix(int rows, int cols) : rows(rows), cols(cols){
         // std::cout << "Matrix Created" << std::endl;
-    this -> data = new double[rows * cols]{0};
+    this -> data = new T[rows * cols]{0};
     }
 // Constructor that fills the MAtrix with values
     Matrix(int rows, int cols, const std::initializer_list<T> &list) : Matrix(rows, cols) {
@@ -155,7 +155,7 @@ public:
     template<typename U>
     Matrix<typename std::common_type<T, U>::type> operator*(U x) const {
         // std::cout << "Scalar Multiplication Operator" << std::endl;
-        Matrix<T> newmat(rows, cols);
+        Matrix<typename std::common_type<T, U>::type> newmat(rows, cols);
         // Cycles through the values in the matrix and multiplies each by the scalar provided
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -177,19 +177,19 @@ public:
         catch (const char *msg) {
             std::cout << msg << std::endl;
         }
-        Matrix<T> newmat(rows, B.cols);
+        Matrix<typename std::common_type<T, U>::type> newmat(rows, B.cols);
 
         // std::cout << newmat.getRows() << " " << newmat.getCols() << std::endl;
         // Multiplies the Matrices with the AxB * BxC = AxC
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < B.cols; j++) {
-                double temp_sum = 0;
+                // T temp_sum = 0; //----------------------------------------------------------------------CHECK
 
                 for (int k = 0; k < B.rows; k++) {
 
-                    temp_sum += data[i * cols + k] * B.data[k * B.cols + j];
+                    newmat.data[i * newmat.cols + j] += data[i * cols + k] * B.data[k * B.cols + j];
                 }
-                newmat.data[i * newmat.cols + j] = temp_sum;
+                // newmat.data[i * newmat.cols + j] = temp_sum;
                 // std::cout << newmat.data[i * newmat.cols + j] << std::endl;
             }
         }
@@ -308,7 +308,7 @@ public:
     // constructor
     Linear(int in_features, int out_features, int n_samples, int seed) :
             in_features(in_features), out_features(out_features), n_samples(n_samples), seed(seed) {
-        std::cout << "Linear Layer Constructed-------------------------" << std::endl;
+        // std::cout << "Linear Layer Constructed-------------------------" << std::endl;
 
         std::default_random_engine generator(seed);
         std::normal_distribution<T> distribution_normal(0.0, 1.0);
@@ -337,20 +337,20 @@ public:
 
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
-        std::cout << "Forward Linear Function-------------------------------" << std::endl;
+        // std::cout << "Forward Linear Function-------------------------------" << std::endl;
         // std::cout << out_features << std::endl;
         // std::cout << weights.getRows() << std::endl;
         // std::cout << weights.getCols() << std::endl;
         // std::cout << cache.getRows() << std::endl;
         Matrix<T> y = x * weights + bias;
         cache = x;
-        matprint(y);
+        // matprint(y);
         return y;
     }
 
     // backward function
     virtual Matrix<T> backward(const Matrix<T> &dy) override final {
-        std::cout << "Backward Linear Function----------------------------------" << std::endl;
+        // std::cout << "Backward Linear Function----------------------------------" << std::endl;
 
         this->weights_gradients = cache.transpose() * dy;
         // this-> bias_gradients = dy;
@@ -365,27 +365,27 @@ public:
         // std::cout<<dy.getRows()<<dy.getCols()<<std::endl;
         // std::cout<<weights.getRows()<<weights.getCols()<<std::endl;
         Matrix<T> result = dy * weights.transpose();
-        std::cout<<"------------------------------Weights Gradients------------------------------"<<std::endl;
-        matprint(weights_gradients);
-        std::cout<<"------------------------------Loss Gradient------------------------------"<<std::endl;
-        matprint(result);
-        std::cout<<"------------------------------Bias Gradients------------------------------"<<std::endl;
-        matprint(bias_gradients);
+        // std::cout<<"------------------------------Weights Gradients------------------------------"<<std::endl;
+        // matprint(weights_gradients);
+        // std::cout<<"------------------------------Loss Gradient------------------------------"<<std::endl;
+        // matprint(result);
+        // std::cout<<"------------------------------Bias Gradients------------------------------"<<std::endl;
+        // matprint(bias_gradients);
         return result;
     }
 
     // optimize function
     void optimize(T learning_rate) {
-        std::cout<<"Linear Optimizer--------------"<<std::endl;
+        // std::cout<<"Linear Optimizer--------------"<<std::endl;
         weights = weights - weights_gradients * learning_rate;
-        std::cout<<"------------------------------Weights Optimized------------------------------"<<std::endl;
-        matprint(weights);
+        // std::cout<<"------------------------------Weights Optimized------------------------------"<<std::endl;
+        // matprint(weights);
         // std::cout<<"Bias Matrix"<<std::endl;
         // matprint(bias);
         // matprint(bias_gradients);
         bias = bias - bias_gradients * learning_rate;
-        std::cout<<"------------------------------Bias Optimized------------------------------"<<std::endl;
-        matprint(bias);
+        // std::cout<<"------------------------------Bias Optimized------------------------------"<<std::endl;
+        // matprint(bias);
     }
 
 };
@@ -398,8 +398,8 @@ class ReLU : public Layer<T> {
     int n_samples{};
     Matrix<T> cache{};
 
-public:
 
+public:
 
     // default constructor
     ReLU() {
@@ -410,14 +410,14 @@ public:
     ReLU(int in_features, int out_features, int n_samples) :
             in_features(in_features), out_features(out_features),
             n_samples(n_samples) {
-            cache = Matrix<T>(n_samples, in_features);
+            this -> cache = Matrix<T>(n_samples, in_features);
             try {
             if (in_features != out_features) throw "In features and out features must be the same!";
             }
             catch (const char *msg) {
             std::cout << msg << std::endl;
         }
-        std::cout << "ReLu Layer Constructed------------------------------------" << std::endl;
+        // std::cout << "ReLu Layer Constructed------------------------------------" << std::endl;
     }
 
     // destructor
@@ -425,41 +425,39 @@ public:
 
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
-        std::cout << "ReLu Forward-------------------------------------------------" << std::endl;
+        // std::cout << "ReLu Forward-------------------------------------------------" << std::endl;
         // std::cout << x.getRows() << std::endl;
         // std::cout << x.getCols() << std::endl;
         Matrix<T> y(x.getRows(), x.getCols());
-        std::pair<int, int> index = {0, 0};
+
         for (int i = 0; i < x.rows; i++) {
             for (int j = 0; j < x.cols; j++) {
-                index.first = i;
-                index.second = j;
-                y[index] = std::max(0.0, x[index]);
+
+                y[{i,j}] = std::max(0.0, x[{i,j}]);
             }
         }
-        matprint(y);
+      
         return y;
     }
 
     // backward function
     virtual Matrix<T> backward(const Matrix<T> &dy) override final {
-        std::cout<<"ReLu Backward-----------------"<<std::endl;
+        // std::cout<<"ReLu Backward-----------------"<<std::endl;
         Matrix<T> dx(dy.getRows(), dy.getCols());
-        std::pair<int, int> index = {0, 0};
+
         for (int i = 0; i < dy.getRows(); i++) {
             for (int j = 0; j < dy.getCols(); j++) {
-                index.first = i;
-                index.second = j;
-                if (cache[index] < 0) {
-                    dx[index] = 0;
+
+                if (cache[{i,j}] < 0) {
+                    dx[{i,j}] = 0;
                 } else {
-                    dx[index] = 1; // changed dy[index] to 1
+                    dx[{i,j}] = 1; // changed dy[{i,j}] to 1
                 } //CHECK THIS ---------------------------------------------------
             }
 
         }
-        std::cout<<"------------------------------ReLu Gradient------------------------------"<<std::endl;
-        matprint(dx);
+        // std::cout<<"------------------------------ReLu Gradient------------------------------"<<std::endl;
+        // matprint(dx);
         return dx;
     }
 
@@ -491,7 +489,7 @@ public:
         linear1 = Linear<T>(in_features, hidden_dim, n_samples, seed);
         relu = ReLU<T>(hidden_dim, hidden_dim, n_samples);
         linear2 = Linear<T>(hidden_dim, out_features, n_samples, seed);
-        std::cout << "Net Constructed----------------" << std::endl;
+        // std::cout << "Net Constructed----------------" << std::endl;
     }
 
     // destructor
@@ -515,9 +513,9 @@ public:
 
     // optimize
     void optimize(T learning_rate) {
-        std::cout<<"Optimizing First Layer-----------"<<std::endl;
+        // std::cout<<"Optimizing First Layer-----------"<<std::endl;
         linear1.optimize(learning_rate);
-        std::cout<<"Optimizing Second Layer------------"<<std::endl;
+        // std::cout<<"Optimizing Second Layer------------"<<std::endl;
         linear2.optimize(learning_rate);
     }
 };
@@ -529,19 +527,17 @@ T MSEloss(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     float sum = 0;
     int y_true_size = y_true.getRows() * y_true.getCols();
     Matrix<T> new_mat(y_true.getRows(), y_true.getCols());
-    std::pair<int, int> index = {0, 0};
+
     for (int i = 0; i < y_true.getRows(); i++) {
         for (int j = 0; j < y_true.getCols(); j++) {
-            index.first = i;
-            index.second = j;
-            new_mat[index] = (y_pred[index] - y_true[index]) * (y_pred[index] - y_true[index]);
+
+            new_mat[{i,j}] = (y_pred[{i,j}] - y_true[{i,j}]) * (y_pred[{i,j}] - y_true[{i,j}]);
         }
     }
     for (int i = 0; i < y_true.getCols(); i++) {
         for (int j = 0; j < y_true.getCols(); j++) {
-            index.first = i;
-            index.second = j;
-            sum += new_mat[index];
+
+            sum += new_mat[{i,j}];
         }
 
     }
@@ -554,12 +550,11 @@ template<typename T>
 Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     // Your implementation of the MSEgrad function starts here
     Matrix<T> grad_mat(y_true.getRows(), y_true.getCols());
-    std::pair<int, int> index = {0, 0};
+
     for (int i = 0; i < y_pred.getRows(); i++) {
         for (int j = 0; j < y_pred.getCols(); j++) {
-            index.first = i;
-            index.second = j;
-            grad_mat[index] = 2 * (y_pred[index] - y_true[index])/(y_true.getRows()*y_true.getCols());
+
+            grad_mat[{i,j}] = 2 * (y_pred[{i,j}] - y_true[{i,j}])/(y_true.getRows()*y_true.getCols());
         }
     }
     return grad_mat;
@@ -569,7 +564,7 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
 template<typename T>
 Matrix<T> argmax(const Matrix<T> &y) {
     // Your implementation of the argmax function starts here
-    std::cout<<"Calculating argmax--------------"<<std::endl;
+    // std::cout<<"Calculating argmax--------------"<<std::endl;
     Matrix<T> matmax(1, y.getRows());
     for (int i = 0; i < y.getRows(); i++) {
         int indmax = 0;
@@ -600,17 +595,18 @@ Matrix<T> argmax(const Matrix<T> &y) {
 // }
 template<typename T>
 T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
-{
+{ 
     Matrix<T> argmax_true = argmax(y_true);
     Matrix<T> argmax_pred = argmax(y_pred);
     int counter_true = 0;
-    for (int i = 0; i < y_true.cols; i++) {
-        if (y_true[{0, i}] == y_pred[{0, i}]) {
+    for (int i = 0; i < argmax_true.cols; i++) {
+        if (argmax_true[{0, i}] == argmax_pred[{0, i}]) {
             counter_true += 1;
         }
     }
-    return counter_true / (y_true.cols);
+    return (double)counter_true / (argmax_true.cols);
 }
+
 template<typename T>
 void matprint(const Matrix<T> matrix) {
     for (int i = 0; i < matrix.rows; ++i) {
@@ -624,15 +620,16 @@ void matprint(const Matrix<T> matrix) {
 
 void acc_test(){
 Matrix<double> mat1(2,2,{1,2,3,4});
-Matrix<double> mat2(2,2,{1,2,3,2});
+Matrix<double> mat2(2,2,{1,2,1,4});
 std::cout<<get_accuracy(mat1,mat2)<<std::endl;;
 }
 void relu_test(){
     ReLU<double> relu(3,2,3);
     Matrix<double> mat1(2,2,{1,2,3,4});
     Matrix<double> mat2(2,2,{1,2,3,4});
-    relu.forward(mat1);
+    Matrix<double>  mat3 = relu.forward(mat1);
     
+    matprint(mat3);
 }
 void mat_class_test(){
     Matrix<double> C(2, 2, {1, 2, 3, 4});
@@ -651,20 +648,55 @@ void mat_class_test(){
     matprint(D);
     // Access Operator Tests
     Matrix<double> G(2,2,{2,4,6,8});
+    for (int i =0; i< G.getRows();i++){
+        for(int j =0; j<G.getCols();j++)
+        std::cout<<G[{i,j}];
+    }
 
 
+}
+void mat_plus_test(){
+    // Arithmetic Operator Tests
+    Matrix<double> A(2,2,{2,4,6,8});
+    Matrix<int> B(2,2,{2,4,6,8});
+    Matrix<float> C(2,2,{2,4,6,8});
+    auto D = A+B;
+    matprint(D);
+    std::cout<<typeid(D).name()<<std::endl;
+    auto E = A+C;
+    matprint(E);
+    std::cout<<typeid(E).name()<<std::endl;
+    auto F = B+C;
+    matprint(F);
+    std::cout<<typeid(F).name()<<std::endl;
+}
+void mat_minus_test(){
+    // Arithmetic Operator Tests
+    Matrix<double> A(2,2,{2,4,6,8});
+    Matrix<int> B(2,2,{2,4,6,8});
+    Matrix<float> C(2,2,{2,4,6,8});
+    auto D = A-B;
+    matprint(D);
+    std::cout<<typeid(D).name()<<std::endl;
+    auto E = A-C;
+    matprint(E);
+    std::cout<<typeid(E).name()<<std::endl;
+    auto F = B-C;
+    matprint(F);
+    std::cout<<typeid(F).name()<<std::endl;
 }
 int main(int argc, char *argv[]) {
     // Your training and testing of the Net class starts here
 
-    // Matrix<double> mat1(2, 2, {1, 2, 3, 4});
-    // Matrix<double> mat2(1, 2, {1, 1});
-    // auto mat3 = mat1 + mat2;
-    // matprint(mat3);
+    Matrix<double> mat1(2, 2, {1, 2, 3, 4});
+    Matrix<double> mat2(1, 2, {1, 1});
+ 
+
     // std::pair<int, int> pair1(0,1);
     // int x = 3;
     // Matrix<double> mat2 = mat1*x;
-    // Matrix<double> mat3 = mat1*mat1;
+    Matrix<double> mat3 = mat1*mat1;
+    matprint(mat3);
     // Matrix<double> mat4 = mat3-mat1;
     // Matrix<double> mat5 = mat1.transpose();
     // std::cout<<mat5.getCols()<<std::endl;
@@ -684,7 +716,7 @@ int main(int argc, char *argv[]) {
 
     // Matrix<double> mat9 = mat3+mat10;
     // acc_test();
-    relu_test();
+    // relu_test();
     // double learning_rate = 0.0005;
     // int optimizer_steps = 100;
     // int seed = 1;
@@ -693,22 +725,25 @@ int main(int argc, char *argv[]) {
     // int in_features = 2;
     // int hidden_dim = 10;
     // int out_features = 2;
-    // int n_samples = 4;
-
+    // int n_samples = 8;
+    // mat_plus_test();
     // Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
 
     // for (int i = 0; i < optimizer_steps; i++) {
     //     std::cout << "-------------------------------------------" << std::endl;
     //     std::cout << "Step: " << i << std::endl;
-    //     std::cout << "Forward Step" << std::endl;
-    //     Matrix<double> fwd_step = net.forward(xxor);
 
+    //     Matrix<double> fwd_step = net.forward(xxor);
+    //     std::cout<<"----------Forward Step----------"<<std::endl;
+    //     matprint(fwd_step);
     //     double loss = MSEloss(yxor, fwd_step);
     //     std::cout << loss << std::endl;
 
     //     Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
 
     //     Matrix<double> back_step = net.backward(gradmat);
+    //     std::cout<<"----------Back Step----------"<<std::endl;
+    //     matprint(back_step);
     //     std::cout << "Optimizing--------------------------------" << std::endl;
     //     net.optimize(learning_rate);
 
