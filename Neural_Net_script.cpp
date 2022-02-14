@@ -316,13 +316,13 @@ public:
 
         bias = Matrix<T>(1, out_features); //uniform
         for (int i = 0; i < out_features; i++) {
-            bias[{0, i}] = (int) distribution_uniform(generator);
+            bias[{0, i}] =  distribution_uniform(generator);
         }
 
         weights = Matrix<T>(in_features, out_features); //normal
         for (int i = 0; i < in_features; i++) {
             for (int j = 0; j < out_features; j++) {
-                weights[{i, j}] = (int) distribution_normal(generator);
+                weights[{i, j}] =  distribution_normal(generator);
             }
         }
 
@@ -553,8 +553,8 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
 
     for (int i = 0; i < y_pred.getRows(); i++) {
         for (int j = 0; j < y_pred.getCols(); j++) {
-
-            grad_mat[{i,j}] = 2 * (y_pred[{i,j}] - y_true[{i,j}])/(y_true.getRows()*y_true.getCols());
+            T two = 2;
+            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}])/(y_true.getRows()*y_true.getCols());
         }
     }
     return grad_mat;
@@ -579,20 +579,6 @@ Matrix<T> argmax(const Matrix<T> &y) {
     return matmax;
 }
 
-// Calculate the accuracy of the prediction, using the argmax
-// template<typename T>
-// T get_accuracy(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
-//     // Your implementation of the get_accuracy starts here
-//     Matrix<T> matmax_true_args = argmax(y_true);
-//     Matrix<T> matmax_pred_args = argmax(y_pred);
-//     double tot = 0;
-//     std::cout<<"Accuracy Calculating-------------"<<std::endl;
-//     for (int i = 0; i < y_true.getRows(); i++) {
-//         tot += abs(y_true[{i, matmax_true_args[{0,i}]}] - y_pred[{i, matmax_pred_args[{0,i}]}]) / y_true[{i, matmax_true_args[{0,i}]}];
-        
-//     }
-//     return tot / (y_true.getRows());
-// }
 template<typename T>
 T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
 { 
@@ -628,7 +614,9 @@ matprint(mat2);
 void acc_test(){
 Matrix<double> mat1(2,2,{1,2,3,4});
 Matrix<double> mat2(2,2,{1,2,1,0});
-std::cout<<get_accuracy(mat1,mat2)<<std::endl;;
+Matrix<double> mat3(4,2,{1,2,3,4,0,1,2,1});
+Matrix<double> mat4(4,2,{1,2,1,0,1,0,0,4});
+std::cout<<get_accuracy(mat3,mat4)<<std::endl;;
 }
 void relu_test(){
     ReLU<double> relu(3,2,3);
@@ -667,15 +655,23 @@ void mat_plus_test(){
     Matrix<double> A(2,2,{2,4,6,8});
     Matrix<int> B(2,2,{2,4,6,8});
     Matrix<float> C(2,2,{2,4,6,8});
+
+     Matrix<double> A1(1,2,{6,8});
+    Matrix<int> B1(2,1,{4,6});
+    Matrix<float> C1(3,1,{2,4,6});   
     auto D = A+B;
     matprint(D);
-    std::cout<<typeid(D).name()<<std::endl;
+    std::cout<<typeid(D[{0,0}]).name()<<std::endl;
     auto E = A+C;
     matprint(E);
-    std::cout<<typeid(E).name()<<std::endl;
+    std::cout<<typeid(E[{0,0}]).name()<<std::endl;
     auto F = B+C;
     matprint(F);
-    std::cout<<typeid(F).name()<<std::endl;
+    std::cout<<typeid(F[{0,0}]).name()<<std::endl;
+
+    auto G = A+A1;
+    matprint(G);
+    std::cout<<typeid(G[{0,0}]).name()<<std::endl;  
 }
 void mat_minus_test(){
     // Arithmetic Operator Tests
@@ -692,41 +688,75 @@ void mat_minus_test(){
     matprint(F);
     std::cout<<typeid(F).name()<<std::endl;
 }
+void scalar_matmul_test(){
+    int int_scalar = 2;
+    double double_scalar = 2;
+    float float_scalar = 2;
+    Matrix<double> A(2,2,{2,4,6,8});
+    Matrix<float> B(2,2,{2,4,6,8});
+    Matrix<int> C(2,2,{2,4,6,8});
+    std::cout<<"----------Integer Scalar Test----------"<<std::endl;
+    auto int_scalar_test1  = A*int_scalar;
+    
+    matprint(int_scalar_test1);
+    std::cout<<typeid(int_scalar_test1[{0,0}]).name()<<std::endl;
+    auto int_scalar_test2  = B*int_scalar;
+    matprint(int_scalar_test2);
+    std::cout<<typeid(int_scalar_test2[{0,0}]).name()<<std::endl;
+    auto int_scalar_test3  = C*int_scalar;
+    matprint(int_scalar_test3);
+    std::cout<<typeid(int_scalar_test3[{0,0}]).name()<<std::endl;
+
+    std::cout<<"----------Double Scalar Test----------"<<std::endl;
+
+    auto double_scalar_test1  = A*double_scalar;
+    matprint(double_scalar_test1);
+    std::cout<<typeid(double_scalar_test1[{0,0}]).name()<<std::endl;
+    auto double_scalar_test2  = B*double_scalar;
+    matprint(double_scalar_test2);
+    std::cout<<typeid(double_scalar_test1[{0,0}]).name()<<std::endl;
+    auto double_scalar_test3  = C*double_scalar;
+    matprint(double_scalar_test3);
+    std::cout<<typeid(double_scalar_test1[{0,0}]).name()<<std::endl;
+
+    std::cout<<"----------Float Scalar Test----------"<<std::endl;
+
+    auto float_scalar_test1  = A*float_scalar;
+    matprint(float_scalar_test1);
+    std::cout<<typeid(float_scalar_test1[{0,0}]).name()<<std::endl;
+    auto float_scalar_test2  = B*float_scalar;
+    matprint(float_scalar_test2);
+    std::cout<<typeid(float_scalar_test1[{0,0}]).name()<<std::endl;
+    auto float_scalar_test3  = C*float_scalar;
+    matprint(float_scalar_test3);
+    std::cout<<typeid(float_scalar_test1[{0,0}]).name()<<std::endl;
+}
+void matrix_matmul_test(){
+    Matrix<double> A(2,2,{2,4,6,8});
+    Matrix<float> B(2,2,{2,4,6,8});
+    Matrix<int> C(2,2,{2,4,6,8});
+    Matrix<double> A1(4,1,{2,4,6,8});
+    Matrix<float> B1(2,1,{2,4});
+    Matrix<int> C1(2,1,{4,6});
+    auto double_float = A*B;
+    auto float_double = B*A;
+    matprint(double_float);
+    std::cout<<typeid(double_float[{0,0}]).name()<<std::endl;
+    matprint(float_double);
+    std::cout<<typeid(float_double[{0,0}]).name()<<std::endl;
+
+}
 int main(int argc, char *argv[]) {
     // Your training and testing of the Net class starts here
 
-    // Matrix<double> mat1(2, 2, {1, 2, 3, 4});
-    // Matrix<double> mat2(1, 2, {1, 1});
- 
-
-    // std::pair<int, int> pair1(0,1);
-    // int x = 3;
-    // Matrix<double> mat2 = mat1*x;
-    // Matrix<double> mat3 = mat1*mat1;
-    // matprint(mat3);
-    // Matrix<double> mat4 = mat3-mat1;
-    // Matrix<double> mat5 = mat1.transpose();
-    // std::cout<<mat5.getCols()<<std::endl;
-    // std::cout<<mat5[pair1]<<std::endl;
-    // std::cout<<mat4[pair1]<<std::endl;
-    // std::cout<<mat3[pair1]<<std::endl;
-    // std::cout<<mat2[pair1]<<std::endl;
-    // std::cout<<mat1[pair1]<<std::endl;
-    // Matrix<double> mat6(2,2,{1,2,3,4,5});
-    // std::pair<int, int> pair2(0,2);
-    // std::cout<<mat1[pair2]<<std::endl;
-
-    // Matrix<double> mat10(2,3,{1,2,3,4,5,6});
-    // Matrix<double> mat7 = mat1*mat10;
-    // Matrix<double> mat8 = mat3-mat10;
-    // //std::cout<<mat8[pair2]<<std::endl;
-
-    // Matrix<double> mat9 = mat3+mat10;
     // argmax_test();
-    acc_test();
+    // acc_test();
     // relu_test();
+    // scalar_matmul_test();
+    // matrix_matmul_test();
+    mat_plus_test();
     double learning_rate = 0.0005;
-    int optimizer_steps = 250;
+    int optimizer_steps = 200;
     int seed = 1;
     Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
     Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
@@ -734,30 +764,33 @@ int main(int argc, char *argv[]) {
     int hidden_dim = 100;
     int out_features = 2;
     int n_samples = 8;
-    // mat_plus_test();
+
     Net<double> net(in_features, hidden_dim, out_features, n_samples, seed);
 
     for (int i = 0; i < optimizer_steps; i++) {
         std::cout << "-------------------------------------------" << std::endl;
         std::cout << "Step: " << i << std::endl;
-
+        double acc1 = get_accuracy(yxor,xxor);
+        std::cout<<acc1<<std::endl;
         Matrix<double> fwd_step = net.forward(xxor);
-        // std::cout<<"----------Forward Step----------"<<std::endl;
-        // matprint(fwd_step);
+        std::cout<<"----------Forward Step----------"<<std::endl;
+        matprint(xxor);
         double loss = MSEloss(yxor, fwd_step);
         std::cout<<"LOSS"<<std::endl;
         std::cout << loss << std::endl;
 
         Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
 
-        Matrix<double> back_step = net.backward(gradmat);
+        Matrix<double> xxor = net.backward(gradmat);
+        std::cout<<"----------xxor----------"<<std::endl;
+        matprint(xxor);
         // std::cout<<"----------Back Step----------"<<std::endl;
         // matprint(back_step);
         // std::cout << "Optimizing--------------------------------" << std::endl;
         net.optimize(learning_rate);
         std::cout<<"Accuracy"<<std::endl;
-        double acc = get_accuracy(yxor, back_step);
-        std::cout << acc << std::endl;
+        double acc = get_accuracy(yxor, fwd_step);
+        // std::cout << acc << std::endl;
     }
 
     return 0;
