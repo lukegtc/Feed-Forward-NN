@@ -343,7 +343,7 @@ public:
         // std::cout << weights.getCols() << std::endl;
         // std::cout << cache.getRows() << std::endl;
         Matrix<T> y = x * weights + bias;
-        cache = x;
+        this-> cache = x;
         // matprint(y);
         return y;
     }
@@ -429,7 +429,7 @@ public:
         // std::cout << x.getRows() << std::endl;
         // std::cout << x.getCols() << std::endl;
         Matrix<T> y(x.getRows(), x.getCols());
-
+        this -> cache = x;
         for (int i = 0; i < x.rows; i++) {
             for (int j = 0; j < x.cols; j++) {
                 T min_val = 0;
@@ -554,10 +554,10 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     for (int i = 0; i < y_pred.getRows(); i++) {
         for (int j = 0; j < y_pred.getCols(); j++) {
             T two = 2;
-            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}])/(y_true.getRows()*y_true.getCols());
+            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}]);
         }
     }
-    return grad_mat;
+    return grad_mat;//(y_true.getRows()*y_true.getCols());
 }
 
 // Calculate the argmax
@@ -756,7 +756,7 @@ int main(int argc, char *argv[]) {
     // matrix_matmul_test();
     mat_plus_test();
     double learning_rate = 0.0005;
-    int optimizer_steps = 200;
+    int optimizer_steps = 40;
     int seed = 1;
     Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
     Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
@@ -770,8 +770,8 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < optimizer_steps; i++) {
         std::cout << "-------------------------------------------" << std::endl;
         std::cout << "Step: " << i << std::endl;
-        double acc1 = get_accuracy(yxor,xxor);
-        std::cout<<acc1<<std::endl;
+        // double acc1 = get_accuracy(yxor,xxor);
+        // std::cout<<acc1<<std::endl;
         Matrix<double> fwd_step = net.forward(xxor);
         std::cout<<"----------Forward Step----------"<<std::endl;
         matprint(xxor);
@@ -781,7 +781,7 @@ int main(int argc, char *argv[]) {
 
         Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
 
-        Matrix<double> xxor = net.backward(gradmat);
+        Matrix<double> back_step = net.backward(gradmat);
         std::cout<<"----------xxor----------"<<std::endl;
         matprint(xxor);
         // std::cout<<"----------Back Step----------"<<std::endl;
@@ -790,7 +790,7 @@ int main(int argc, char *argv[]) {
         net.optimize(learning_rate);
         std::cout<<"Accuracy"<<std::endl;
         double acc = get_accuracy(yxor, fwd_step);
-        // std::cout << acc << std::endl;
+        std::cout << acc << std::endl;
     }
 
     return 0;
