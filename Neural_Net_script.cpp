@@ -447,17 +447,15 @@ public:
 
         for (int i = 0; i < dy.getRows(); i++) {
             for (int j = 0; j < dy.getCols(); j++) {
-                // Not supposed to use cache
-                if (dy[{i,j}] < 0) {
-                    dx[{i,j}] = 0;
-                } else {
-                    dx[{i,j}] = dy[{i,j}]; // changed dy[{i,j}] to 1
-                } //CHECK THIS ---------------------------------------------------
+                T zero = 0;
+                dx[{i,j}] = (dy[{i,j}] < zero ? zero : dy[{i,j}]);
+
+                }
             }
 
-        }
+        
         // std::cout<<"------------------------------ReLu Gradient------------------------------"<<std::endl;
-        // matprint(dx);
+
         return dx;
     }
 
@@ -527,7 +525,7 @@ T MSEloss(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     T sum = 0;
     int y_true_size = y_true.getRows() * y_true.getCols();
     Matrix<T> new_mat(y_true.getRows(), y_true.getCols());
-
+    
     for (int i = 0; i < y_true.getRows(); i++) {
         for (int j = 0; j < y_true.getCols(); j++) {
             
