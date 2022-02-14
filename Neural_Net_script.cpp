@@ -338,10 +338,7 @@ public:
     // forward function
     virtual Matrix<T> forward(const Matrix<T> &x) override final {
         // std::cout << "Forward Linear Function-------------------------------" << std::endl;
-        // std::cout << out_features << std::endl;
-        // std::cout << weights.getRows() << std::endl;
-        // std::cout << weights.getCols() << std::endl;
-        // std::cout << cache.getRows() << std::endl;
+
         Matrix<T> y = x * weights + bias;
         this-> cache = x;
         // matprint(y);
@@ -529,16 +526,10 @@ T MSEloss(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     for (int i = 0; i < y_true.getRows(); i++) {
         for (int j = 0; j < y_true.getCols(); j++) {
             
-            new_mat[{i,j}] = (y_pred[{i,j}] - y_true[{i,j}]) * (y_pred[{i,j}] - y_true[{i,j}]);
+            sum += (y_pred[{i,j}] - y_true[{i,j}]) * (y_pred[{i,j}] - y_true[{i,j}]);
         }
     }
-    for (int i = 0; i < y_true.getRows(); i++) {
-        for (int j = 0; j < y_true.getCols(); j++) {
 
-            sum += new_mat[{i,j}];
-        }
-
-    }
     return sum / (y_true_size);
 }
 
@@ -552,7 +543,7 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     for (int i = 0; i < y_pred.getRows(); i++) {
         for (int j = 0; j < y_pred.getCols(); j++) {
             T two = 2;
-            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}]);//(y_true.getRows()*y_true.getCols());
+            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}])/(y_true.getRows()*y_true.getCols());
         }
     }
     return grad_mat;
@@ -581,9 +572,9 @@ template<typename T>
 T get_accuracy(const Matrix<T>& y_true, const Matrix<T>& y_pred)
 { 
     Matrix<T> argmax_true = argmax(y_true);
-    matprint(argmax_true);
+    
     Matrix<T> argmax_pred = argmax(y_pred);
-    matprint(argmax_pred);
+    
     T counter_true = 0;
     for (int i = 0; i < argmax_true.cols; i++) {
         if (argmax_true[{0,i}] == argmax_pred[{0,i}]) {
@@ -754,7 +745,7 @@ int main(int argc, char *argv[]) {
     // matrix_matmul_test();
     mat_plus_test();
     double learning_rate = 0.0005;
-    int optimizer_steps = 100;
+    int optimizer_steps = 10000;
     int seed = 1;
     Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
     Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
@@ -771,8 +762,8 @@ int main(int argc, char *argv[]) {
         // double acc1 = get_accuracy(yxor,xxor);
         // std::cout<<acc1<<std::endl;
         Matrix<double> fwd_step = net.forward(xxor);
-        std::cout<<"----------Forward Step----------"<<std::endl;
-        matprint(xxor);
+        // std::cout<<"----------Forward Step----------"<<std::endl;
+        // matprint(xxor);
         double loss = MSEloss(yxor, fwd_step);
         std::cout<<"LOSS"<<std::endl;
         std::cout << loss << std::endl;
@@ -780,8 +771,8 @@ int main(int argc, char *argv[]) {
         Matrix<double> gradmat = MSEgrad(yxor, fwd_step);
 
         Matrix<double> back_step = net.backward(gradmat);
-        std::cout<<"----------xxor----------"<<std::endl;
-        matprint(xxor);
+        // std::cout<<"----------xxor----------"<<std::endl;
+        // matprint(xxor);
         // std::cout<<"----------Back Step----------"<<std::endl;
         // matprint(back_step);
         // std::cout << "Optimizing--------------------------------" << std::endl;
