@@ -524,17 +524,17 @@ public:
 template<typename T>
 T MSEloss(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     // Your implementation of the MSEloss function starts here
-    float sum = 0;
+    T sum = 0;
     int y_true_size = y_true.getRows() * y_true.getCols();
     Matrix<T> new_mat(y_true.getRows(), y_true.getCols());
 
     for (int i = 0; i < y_true.getRows(); i++) {
         for (int j = 0; j < y_true.getCols(); j++) {
-
+            
             new_mat[{i,j}] = (y_pred[{i,j}] - y_true[{i,j}]) * (y_pred[{i,j}] - y_true[{i,j}]);
         }
     }
-    for (int i = 0; i < y_true.getCols(); i++) {
+    for (int i = 0; i < y_true.getRows(); i++) {
         for (int j = 0; j < y_true.getCols(); j++) {
 
             sum += new_mat[{i,j}];
@@ -554,10 +554,10 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     for (int i = 0; i < y_pred.getRows(); i++) {
         for (int j = 0; j < y_pred.getCols(); j++) {
             T two = 2;
-            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}]);
+            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}]);//(y_true.getRows()*y_true.getCols());
         }
     }
-    return grad_mat;//(y_true.getRows()*y_true.getCols());
+    return grad_mat;
 }
 
 // Calculate the argmax
@@ -756,7 +756,7 @@ int main(int argc, char *argv[]) {
     // matrix_matmul_test();
     mat_plus_test();
     double learning_rate = 0.0005;
-    int optimizer_steps = 40;
+    int optimizer_steps = 100;
     int seed = 1;
     Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
     Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
