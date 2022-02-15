@@ -445,7 +445,8 @@ public:
         for (int i = 0; i < dy.getRows(); i++) {
             for (int j = 0; j < dy.getCols(); j++) {
                 T zero = 0;
-                dx[{i,j}] = (dy[{i,j}] < zero ? zero : dy[{i,j}]);
+                T one = 1;
+                dx[{i,j}] = (dy[{i,j}] < zero ? zero : one);
 
                 }
             }
@@ -744,8 +745,8 @@ int main(int argc, char *argv[]) {
     // scalar_matmul_test();
     // matrix_matmul_test();
     mat_plus_test();
-    double learning_rate = 0.0005;
-    int optimizer_steps = 10000;
+    double learning_rate = 0.001;
+    int optimizer_steps = 400;
     int seed = 1;
     Matrix<double> xxor(4, 2, {0, 0, 0, 1, 1, 0, 1, 1});
     Matrix<double> yxor(4, 2, {1, 0, 0, 1, 0, 1, 1, 0});
