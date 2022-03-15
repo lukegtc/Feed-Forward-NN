@@ -444,8 +444,8 @@ public: // declaration of the needed attributes
         for (int i = 0; i < dy.getRows(); i++) {
             for (int j = 0; j < dy.getCols(); j++) {
                 T zero = 0;
-                T one = 1;
-                dx[{i,j}] = (dy[{i,j}] < zero ? zero : one);
+         
+                dx[{i,j}] = (cache[{i,j}] < zero ? zero : dy[{i,j}]);
             }
         }        
         // std::cout<<"------------------------------ReLu Gradient------------------------------"<<std::endl;
@@ -535,7 +535,7 @@ Matrix<T> MSEgrad(const Matrix<T> &y_true, const Matrix<T> &y_pred) {
     for (int i = 0; i < y_pred.getRows(); i++) {
         for (int j = 0; j < y_pred.getCols(); j++) {
             T two = 2; 
-            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}])/(y_true.getRows()*y_true.getCols()); //Filling the previously created matrix with the gradient 2 * (y_pred[{i,j}] - y_true[{i,j}])/n
+            grad_mat[{i,j}] = two * (y_pred[{i,j}] - y_true[{i,j}]);//(y_true.getRows()*y_true.getCols()); //Filling the previously created matrix with the gradient 2 * (y_pred[{i,j}] - y_true[{i,j}])/n
         }
     }
     return grad_mat; // returning the gradient of the loss
@@ -889,3 +889,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
